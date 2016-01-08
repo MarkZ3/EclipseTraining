@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.cdt.example.framespy.FrameSpyView"
+            id="org.eclipse.cdt.example.framespy.view"
+            name="Frame Spy"
+            restorable="true">
+      </view>
+   </extension>
 
 </plugin>
