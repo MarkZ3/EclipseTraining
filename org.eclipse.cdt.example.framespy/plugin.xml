@@ -10,5 +10,13 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="org.eclipse.cdt.example.framespy.ToggleSpyHandler"
+            id="org.eclipse.cdt.example.framespy.togglespy"
+            name="Toggle Spy">
+      </command>
+   </extension>
 
 </plugin>
