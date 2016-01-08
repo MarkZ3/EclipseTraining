@@ -18,5 +18,18 @@
             name="Toggle Spy">
       </command>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="toolbar:org.eclipse.cdt.example.framespy.view?after=additions">
+         <command
+               commandId="org.eclipse.cdt.example.framespy.togglespy"
+               icon="enablespy.gif"
+               label="Toggle Spy"
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
 
 </plugin>
