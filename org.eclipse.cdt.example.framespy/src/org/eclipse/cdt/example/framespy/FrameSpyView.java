@@ -13,12 +13,15 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
 public class FrameSpyView extends ViewPart {
 
 	private MenuManager fMenuManager;
+	private boolean fToggledState;
+	private Label fToggledStateLbl;
 
 	public FrameSpyView() {
 		// TODO Auto-generated constructor stub
@@ -32,6 +35,9 @@ public class FrameSpyView extends ViewPart {
 		Menu menu = fMenuManager.createContextMenu(composite);
 		composite.setMenu(menu);
 		getViewSite().registerContextMenu(fMenuManager, null);
+		
+		fToggledStateLbl = new Label(composite, SWT.NONE);
+		fToggledStateLbl.setText(Boolean.FALSE.toString());
 	}
 
 	@Override
@@ -44,6 +50,15 @@ public class FrameSpyView extends ViewPart {
 	public void dispose() {
 		super.dispose();
 		fMenuManager.dispose();
+	}
+
+	public boolean getToggledState() {
+		return fToggledState;
+	}
+
+	public void setToggledState(boolean toggledState) {
+		fToggledState = toggledState;
+		fToggledStateLbl.setText(Boolean.toString(fToggledState));
 	}
 
 }

@@ -12,12 +12,14 @@ package org.eclipse.cdt.example.framespy;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 public class ToggleSpyHandler extends AbstractHandler {
 	
 	@Override
-	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("pushed");
+	public Object execute(ExecutionEvent event) throws ExecutionException {	
+		FrameSpyView part = (FrameSpyView) HandlerUtil.getActivePartChecked(event);
+		part.setToggledState(!part.getToggledState());
 		return null;
 	}
 }
