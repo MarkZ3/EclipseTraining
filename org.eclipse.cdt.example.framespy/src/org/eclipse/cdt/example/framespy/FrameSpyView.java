@@ -104,7 +104,12 @@ public class FrameSpyView extends ViewPart {
 					// Ignored
 				}
 				if (getToggledState()) {
-					fToggledStateLbl.setText(Integer.toString(counter));
+					Display.getDefault().asyncExec(new Runnable() {
+						@Override
+						public void run() {
+							fToggledStateLbl.setText(Integer.toString(counter));
+						}
+					});
 					counter++;
 					schedule();
 				}
