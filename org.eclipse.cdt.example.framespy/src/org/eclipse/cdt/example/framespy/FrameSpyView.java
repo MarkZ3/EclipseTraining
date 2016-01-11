@@ -10,10 +10,7 @@
 package org.eclipse.cdt.example.framespy;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
 
@@ -27,23 +24,6 @@ public class FrameSpyView extends ViewPart {
 	public void createPartControl(Composite parent) {
 		Composite c = new Composite(parent, SWT.NONE);
 		c.setLayout(new GridLayout());
-		
-		Button b = new Button(c, SWT.CHECK);
-		b.setText("Enable spy");
-		b.addSelectionListener(new SelectionListener() {
-			
-			@Override
-			public void widgetSelected(SelectionEvent e) {
-				System.out.println("state " + b.getSelection());
-				
-			}
-			
-			@Override
-			public void widgetDefaultSelected(SelectionEvent e) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
 	}
 
 	@Override
