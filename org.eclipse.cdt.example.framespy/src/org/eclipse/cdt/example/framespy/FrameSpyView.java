@@ -9,12 +9,16 @@
 
 package org.eclipse.cdt.example.framespy;
 
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
 public class FrameSpyView extends ViewPart {
+
+	private MenuManager fMenuManager;
 
 	public FrameSpyView() {
 		// TODO Auto-generated constructor stub
@@ -22,14 +26,24 @@ public class FrameSpyView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		Composite c = new Composite(parent, SWT.NONE);
-		c.setLayout(new GridLayout());
+		Composite composite = new Composite(parent, SWT.NONE);
+		composite.setLayout(new GridLayout());
+		fMenuManager = new MenuManager();
+		Menu menu = fMenuManager.createContextMenu(composite);
+		composite.setMenu(menu);
+		getViewSite().registerContextMenu(fMenuManager, null);
 	}
 
 	@Override
 	public void setFocus() {
 		// TODO Auto-generated method stub
 
+	}
+	
+	@Override
+	public void dispose() {
+		super.dispose();
+		fMenuManager.dispose();
 	}
 
 }

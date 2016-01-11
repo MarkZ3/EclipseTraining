@@ -40,6 +40,16 @@
                style="push">
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.cdt.example.framespy.view">
+         <command
+               commandId="org.eclipse.cdt.example.framespy.togglespy"
+               icon="enablespy.gif"
+               label="Toggle Spy"
+               style="push">
+         </command>
+      </menuContribution>
    </extension>
 
 </plugin>
