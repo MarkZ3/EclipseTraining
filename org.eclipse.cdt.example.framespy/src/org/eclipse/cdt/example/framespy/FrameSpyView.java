@@ -19,6 +19,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
@@ -27,9 +28,8 @@ public class FrameSpyView extends ViewPart {
 
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
-//	private boolean fToggledState;
 	private Label fToggledStateLbl;
-private Job fPollingJob;
+	private Job fPollingJob;
 
 	public FrameSpyView() {
 		// TODO Auto-generated constructor stub
@@ -95,7 +95,7 @@ private Job fPollingJob;
 
 	private void startPollingJob() {
 		fPollingJob = new Job("Frame Spy Polling Job") {
-
+			int counter = 0;
 			@Override
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
@@ -103,8 +103,9 @@ private Job fPollingJob;
 				} catch (InterruptedException e) {
 					// Ignored
 				}
-				System.out.println("Polling");
 				if (getToggledState()) {
+					fToggledStateLbl.setText(Integer.toString(counter));
+					counter++;
 					schedule();
 				}
 				return Status.OK_STATUS;
