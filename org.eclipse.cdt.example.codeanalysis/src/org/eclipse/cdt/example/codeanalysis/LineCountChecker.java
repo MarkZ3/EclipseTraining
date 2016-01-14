@@ -9,6 +9,15 @@ public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 
 	@Override
 	public boolean processResource(IResource resource) throws OperationCanceledException {
+		if (!shouldProduceProblems(resource)) {
+			return false;
+		}
+		
+		if (resource instanceof IFile) {
+			IFile file = (IFile) resource;
+			processFile(file);
+			return false;
+		}
 		return false;
 	}
 	
