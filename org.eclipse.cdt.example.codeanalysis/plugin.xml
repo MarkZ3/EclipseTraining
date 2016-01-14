@@ -7,6 +7,16 @@
             class="org.eclipse.cdt.example.codeanalysis.LineCountChecker"
             id="org.eclipse.cdt.example.codeanalysis.linecount"
             name="Line count">
+         <problem
+               category="org.eclipse.cdt.codan.core.categories.CodeStyle"
+               defaultEnabled="true"
+               defaultSeverity="Warning"
+               description="File is too long"
+               id="org.eclipse.cdt.example.codeanalysis.toolong"
+               markerType="org.eclipse.cdt.codan.core.codanProblem"
+               messagePattern="File is too long"
+               name="File too long">
+         </problem>
       </checker>
    </extension>
 
