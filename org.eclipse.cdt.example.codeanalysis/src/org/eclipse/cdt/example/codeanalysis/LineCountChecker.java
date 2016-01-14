@@ -1,8 +1,13 @@
 package org.eclipse.cdt.example.codeanalysis;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.eclipse.cdt.codan.core.model.AbstractCheckerWithProblemPreferences;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.OperationCanceledException;
 
 public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
@@ -22,18 +27,18 @@ public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 	}
 	
 	private void processFile(IFile file) {
-		/*
-		 * Reading from an IFile is not obvious, here's something to start
-		 * 
 		try (BufferedReader bis = new BufferedReader(new InputStreamReader(file.getContents()))) {
-			// TODO: use bis.readLine to read lines one by one, count the number of lines
 			
-			// TODO: print number of lines to System.out.println 
+			String line;
+			int numLines = 0;
+			while ((line = bis.readLine()) != null) {
+				numLines++;
+			}
+			System.out.println(file.getName() + " " + numLines);
 		} catch (IOException e) {
 			// ignore
 		} catch (CoreException e) {
 			// ignore
 		}
-		*/
 	}
 }
