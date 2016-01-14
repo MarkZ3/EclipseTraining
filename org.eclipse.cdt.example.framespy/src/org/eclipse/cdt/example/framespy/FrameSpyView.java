@@ -103,6 +103,16 @@ public class FrameSpyView extends ViewPart {
 				} catch (InterruptedException e) {
 					// Ignored
 				}
+
+				if (monitor.isCanceled()) {
+					Display.getDefault().syncExec(new Runnable() {
+						@Override
+						public void run() {
+							setToggledState(false);
+						}
+					});
+				}
+
 				if (getToggledState()) {
 					Display.getDefault().asyncExec(new Runnable() {
 						@Override
