@@ -17,10 +17,11 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.part.ViewPart;
 
@@ -28,26 +29,28 @@ public class FrameSpyView extends ViewPart {
 
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
-	private Label fToggledStateLbl;
+	private StyledText fLogText;
 	private Job fPollingJob;
 
 	public FrameSpyView() {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
 	public void createPartControl(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
 		composite.setLayout(new GridLayout());
+
+		fLogText = new StyledText(composite, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL | SWT.MULTI);
+		fLogText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
 		fMenuManager = new MenuManager();
-		Menu menu = fMenuManager.createContextMenu(composite);
-		composite.setMenu(menu);
+		Menu menu = fMenuManager.createContextMenu(fLogText);
+		fLogText.setMenu(menu);
 		getViewSite().registerContextMenu(fMenuManager, null);
 		
-		fToggledStateLbl = new Label(composite, SWT.NONE);
 		// Display the new state to the user
 		boolean toggledState = getToggledState();
-		fToggledStateLbl.setText(Boolean.toString(toggledState));
+		fLogText.setText(Boolean.toString(toggledState));
 		// Create the polling job if the spy is enabled
 		if (toggledState) {
 			startPollingJob();
@@ -56,8 +59,7 @@ public class FrameSpyView extends ViewPart {
 
 	@Override
 	public void setFocus() {
-		// TODO Auto-generated method stub
-
+		fLogText.setFocus();
 	}
 	
 	@Override
@@ -76,7 +78,7 @@ public class FrameSpyView extends ViewPart {
 		boolean oldState = getToggledState();
 		if (oldState != newState) {
 			// Display the new state to the user
-			fToggledStateLbl.setText(Boolean.toString(newState));
+			fLogText.setText(Boolean.toString(newState));
 
 			// Save the toggle state in a preference so that it's remembered
 			// next time the view is opened
@@ -108,7 +110,7 @@ public class FrameSpyView extends ViewPart {
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							setToggledState(false); // TODO this set state to false when it could have already been put back to true
+							setToggledState(false); // small bug: this set state to false when it could have already been put back to true
 						}
 					});
 					// Stop here to cancel the repeating job
@@ -126,7 +128,7 @@ public class FrameSpyView extends ViewPart {
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
-						fToggledStateLbl.setText(Integer.toString(counter));
+						fLogText.setText(Integer.toString(counter));
 					}
 				});
 				counter++;
