@@ -37,6 +37,7 @@ import org.eclipse.ui.part.ViewPart;
 
 public class FrameSpyView extends ViewPart {
 
+	private static final int MAX_LOG_SIZE = 20*1024*1024;
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
 	private StyledText fLogText;
@@ -132,81 +133,6 @@ public class FrameSpyView extends ViewPart {
 
 				return Status.OK_STATUS;
 			}
-
-			private void doWork() {
-				// Get the debug selection to know what the user is looking at in the Debug view
-				IAdaptable context = DebugUITools.getDebugContext();
-				if (context == null) {
-					return;
-				}
-
-				// Extract the data model context to use with the DSF services
-				IDMContext dmcontext = context.getAdapter(IDMContext.class);
-				if (dmcontext == null) {
-					// Not dealing with a DSF session
-					return;
-				}
-
-				// Extract DSF session id from the DM context
-				String sessionId = dmcontext.getSessionId();
-				// Get the full DSF session to have access to the DSF executor
-				DsfSession session = DsfSession.getSession(sessionId);
-				if (session == null) {
-					// It could be that this session is no longer active
-					return;
-				}
-
-				session.getExecutor().submit(new DsfRunnable() {
-					@Override
-					public void run() {
-						// Get Stack service using a DSF services tracker object
-						DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), sessionId);
-						IStack stackService = tracker.getService(IStack.class);
-						// Don't forgot to dispose of a tracker before it does out of scope
-						tracker.dispose();
-
-						if (stackService == null) {
-							// Stack service not available.  The debug session
-							// is probably terminating.
-							return;
-						}
-
-						// Get the full DSF session to have access to the DSF executor
-						stackService.getTopFrame(dmcontext, new DataRequestMonitor<IFrameDMContext>(session.getExecutor(), null) {
-							@Override
-							protected void handleSuccess() {
-								// The service called 'handleSuccess()' so we know there is no error.
-								IFrameDMContext frame = getData();
-								// We have a frame context.  It is just a 'pointer' though.
-								// We need to get the data associated with it.
-								stackService.getFrameData(frame, new DataRequestMonitor<IFrameDMData>(session.getExecutor(), null) {
-									@Override
-									protected void handleSuccess() {
-										// We have the frame data, let's print the method name and line number
-										final IFrameDMData frameData = getData();
-
-										Display.getDefault().asyncExec(new Runnable() {
-											@Override
-											public void run() {
-												// Pre-pend the current method:line to the log
-												fLogText.setText(
-														frameData.getFunction() + ":" + frameData.getLine() + "\n" +
-																fLogText.getText());
-											}
-										});								
-									}
-								});
-							}
-							
-							@Override
-							protected void handleError() {
-								// Ignore errors when we select elements
-								// that don't contain frames
-							}
-						});	
-					}
-				});	
-			}
 		};
 		fPollingJob.schedule();
 	}
@@ -215,5 +141,84 @@ public class FrameSpyView extends ViewPart {
 		if (fPollingJob != null) {
 			fPollingJob.cancel();
 		}
+	}
+	
+	private void doWork() {
+		// Get the debug selection to know what the user is looking at in the Debug view
+		IAdaptable context = DebugUITools.getDebugContext();
+		if (context == null) {
+			return;
+		}
+
+		// Extract the data model context to use with the DSF services
+		IDMContext dmcontext = context.getAdapter(IDMContext.class);
+		if (dmcontext == null) {
+			// Not dealing with a DSF session
+			return;
+		}
+
+		// Extract DSF session id from the DM context
+		String sessionId = dmcontext.getSessionId();
+		// Get the full DSF session to have access to the DSF executor
+		DsfSession session = DsfSession.getSession(sessionId);
+		if (session == null) {
+			// It could be that this session is no longer active
+			return;
+		}
+
+		session.getExecutor().submit(new DsfRunnable() {
+			@Override
+			public void run() {
+				// Get Stack service using a DSF services tracker object
+				DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), sessionId);
+				IStack stackService = tracker.getService(IStack.class);
+				// Don't forgot to dispose of a tracker before it does out of scope
+				tracker.dispose();
+
+				if (stackService == null) {
+					// Stack service not available.  The debug session
+					// is probably terminating.
+					return;
+				}
+
+				// Get the full DSF session to have access to the DSF executor
+				stackService.getTopFrame(dmcontext, new DataRequestMonitor<IFrameDMContext>(session.getExecutor(), null) {
+					@Override
+					protected void handleSuccess() {
+						// The service called 'handleSuccess()' so we know there is no error.
+						IFrameDMContext frame = getData();
+						// We have a frame context.  It is just a 'pointer' though.
+						// We need to get the data associated with it.
+						stackService.getFrameData(frame, new DataRequestMonitor<IFrameDMData>(session.getExecutor(), null) {
+							@Override
+							protected void handleSuccess() {
+								// We have the frame data, let's print the method name and line number
+								final IFrameDMData frameData = getData();
+
+								Display.getDefault().asyncExec(new Runnable() {
+									@Override
+									public void run() {
+										if (fLogText.getText().length() > MAX_LOG_SIZE) {
+											// Clear half the log when too big
+											fLogText.setText(fLogText.getText().substring(MAX_LOG_SIZE));
+										}
+										// Pre-pend the current method:line to the log
+										fLogText.setText(
+												frameData.getFunction() + ":" + frameData.getLine() + "\n" +
+														fLogText.getText());
+									}
+								});								
+							}
+						});
+					}
+					
+					@Override
+					protected void handleError() {
+						// Ignore errors when we select elements
+						// that don't contain frames
+					}
+				});	
+			}
+		});	
 	}
 }
