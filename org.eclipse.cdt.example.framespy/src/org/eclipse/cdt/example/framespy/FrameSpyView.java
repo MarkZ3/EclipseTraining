@@ -192,6 +192,11 @@ public class FrameSpyView extends ViewPart {
 							}
 						});
 					}
+					@Override
+					protected void handleError() {
+						// Ignore errors when we select elements
+						// that don't contain frames
+					}
 				});	
 			}
 		};
