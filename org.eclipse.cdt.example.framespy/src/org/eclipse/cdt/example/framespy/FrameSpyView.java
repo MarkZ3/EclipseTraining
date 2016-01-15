@@ -10,6 +10,7 @@
 package org.eclipse.cdt.example.framespy;
 
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
+import org.eclipse.cdt.dsf.concurrent.DsfRunnable;
 import org.eclipse.cdt.dsf.datamodel.IDMContext;
 import org.eclipse.cdt.dsf.debug.service.IStack;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
@@ -126,26 +127,26 @@ public class FrameSpyView extends ViewPart {
 				}
 
 				doWork();
-				
+
 				schedule();
 
 				return Status.OK_STATUS;
 			}
-			
+
 			private void doWork() {
 				// Get the debug selection to know what the user is looking at in the Debug view
 				IAdaptable context = DebugUITools.getDebugContext();
 				if (context == null) {
 					return;
 				}
-				
+
 				// Extract the data model context to use with the DSF services
 				IDMContext dmcontext = context.getAdapter(IDMContext.class);
 				if (dmcontext == null) {
 					// Not dealing with a DSF session
 					return;
 				}
-				
+
 				// Extract DSF session id from the DM context
 				String sessionId = dmcontext.getSessionId();
 				// Get the full DSF session to have access to the DSF executor
@@ -154,48 +155,55 @@ public class FrameSpyView extends ViewPart {
 					// It could be that this session is no longer active
 					return;
 				}
-				
-				// Get Stack service using a DSF services tracker object
-				DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), sessionId);
-				IStack stackService = tracker.getService(IStack.class);
-				// Don't forgot to dispose of a tracker before it does out of scope
-				tracker.dispose();
 
-				if (stackService == null) {
-					// Stack service not available.  The debug session
-					// is probably terminating.
-					return;
-				}
-
-				stackService.getTopFrame(dmcontext, new DataRequestMonitor<IFrameDMContext>(session.getExecutor(), null) {
+				session.getExecutor().submit(new DsfRunnable() {
 					@Override
-					protected void handleSuccess() {
-						// The service called 'handleSuccess()' so we know there is no error.
-						IFrameDMContext frame = getData();
-						// We have a frame context.  It is just a 'pointer' though.
-						// We need to get the data associated with it.
-						stackService.getFrameData(frame, new DataRequestMonitor<IFrameDMData>(session.getExecutor(), null) {
+					public void run() {
+						// Get Stack service using a DSF services tracker object
+						DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), sessionId);
+						IStack stackService = tracker.getService(IStack.class);
+						// Don't forgot to dispose of a tracker before it does out of scope
+						tracker.dispose();
+
+						if (stackService == null) {
+							// Stack service not available.  The debug session
+							// is probably terminating.
+							return;
+						}
+
+						// Get the full DSF session to have access to the DSF executor
+						stackService.getTopFrame(dmcontext, new DataRequestMonitor<IFrameDMContext>(session.getExecutor(), null) {
 							@Override
 							protected void handleSuccess() {
-								// We have the frame data, let's print the method name and line number
-								final IFrameDMData frameData = getData();
-
-								Display.getDefault().asyncExec(new Runnable() {
+								// The service called 'handleSuccess()' so we know there is no error.
+								IFrameDMContext frame = getData();
+								// We have a frame context.  It is just a 'pointer' though.
+								// We need to get the data associated with it.
+								stackService.getFrameData(frame, new DataRequestMonitor<IFrameDMData>(session.getExecutor(), null) {
 									@Override
-									public void run() {
-										// Pre-pend the current method:line to the log
-										fLogText.setText(
-												frameData.getFunction() + ":" + frameData.getLine() + "\n" +
-												fLogText.getText());
+									protected void handleSuccess() {
+										// We have the frame data, let's print the method name and line number
+										final IFrameDMData frameData = getData();
+
+										Display.getDefault().asyncExec(new Runnable() {
+											@Override
+											public void run() {
+												// Pre-pend the current method:line to the log
+												fLogText.setText(
+														frameData.getFunction() + ":" + frameData.getLine() + "\n" +
+																fLogText.getText());
+											}
+										});								
 									}
-								});								
+								});
 							}
-						});
-					}
-					@Override
-					protected void handleError() {
-						// Ignore errors when we select elements
-						// that don't contain frames
+							
+							@Override
+							protected void handleError() {
+								// Ignore errors when we select elements
+								// that don't contain frames
+							}
+						});	
 					}
 				});	
 			}
