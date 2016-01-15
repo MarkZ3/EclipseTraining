@@ -12,6 +12,8 @@ package org.eclipse.cdt.example.framespy;
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
 import org.eclipse.cdt.dsf.concurrent.DsfRunnable;
 import org.eclipse.cdt.dsf.datamodel.IDMContext;
+import org.eclipse.cdt.dsf.debug.service.IRunControl.IContainerSuspendedDMEvent;
+import org.eclipse.cdt.dsf.debug.service.IRunControl.IExecutionDMContext;
 import org.eclipse.cdt.dsf.debug.service.IRunControl.ISuspendedDMEvent;
 import org.eclipse.cdt.dsf.debug.service.IStack;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
@@ -237,15 +239,14 @@ public class FrameSpyView extends ViewPart {
 		// Get the full DSF session to have access to the DSF executor
 		DsfSession session = DsfSession.getSession(sessionId);
 
-		// This will only work in non-stop because it is in this mode
-		// we get a suspended event for a thread.
-		// In all-stop, the suspended event is for the whole process
-		// and processes don't contain frames.
-		
-		// TODO: Check if the event received is actually an
-		//       IContainerSuspendedDMEvent and if so,
-		//       call getTriggeringContexts()[0] to get the thread
-		//       for which we want the stack frame.
+		// For container events (all-stop mode), extract the triggering thread
+		if (event instanceof IContainerSuspendedDMEvent) {
+			IExecutionDMContext[] triggers = ((IContainerSuspendedDMEvent)event).getTriggeringContexts();
+			if (triggers != null && triggers.length > 0) {
+				assert triggers.length == 1;
+				dmcontext = triggers[0];
+			}
+		}
 		
 		logFrameInfo(session, dmcontext);
 	}
