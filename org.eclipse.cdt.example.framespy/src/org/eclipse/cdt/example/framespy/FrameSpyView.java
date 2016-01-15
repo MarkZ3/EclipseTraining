@@ -108,24 +108,29 @@ public class FrameSpyView extends ViewPart {
 					Display.getDefault().syncExec(new Runnable() {
 						@Override
 						public void run() {
-							setToggledState(false);
+							setToggledState(false); // TODO this set state to false when it could have already been put back to true
 						}
 					});
+					// Stop here to cancel the repeating job
+					return Status.OK_STATUS;
 				}
 
-				if (getToggledState()) {
-					Display.getDefault().asyncExec(new Runnable() {
-						@Override
-						public void run() {
-							fToggledStateLbl.setText(Integer.toString(counter));
-						}
-					});
-					counter++;
-					schedule();
-				}
+				doWork();
+				
+				schedule();
+
 				return Status.OK_STATUS;
 			}
-
+			
+			private void doWork() {
+				Display.getDefault().asyncExec(new Runnable() {
+					@Override
+					public void run() {
+						fToggledStateLbl.setText(Integer.toString(counter));
+					}
+				});
+				counter++;
+			}
 		};
 		fPollingJob.schedule();
 	}
