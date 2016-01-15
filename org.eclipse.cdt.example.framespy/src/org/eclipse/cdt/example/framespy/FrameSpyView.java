@@ -18,10 +18,6 @@ import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMData;
 import org.eclipse.cdt.dsf.service.DsfServicesTracker;
 import org.eclipse.cdt.dsf.service.DsfSession;
 import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.debug.ui.DebugUITools;
@@ -41,7 +37,6 @@ public class FrameSpyView extends ViewPart {
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
 	private StyledText fLogText;
-	private Job fPollingJob;
 
 	public FrameSpyView() {
 	}
@@ -107,40 +102,16 @@ public class FrameSpyView extends ViewPart {
 	}
 
 	private void startPollingJob() {
-		fPollingJob = new Job("Frame Spy Polling Job") {
-			@Override
-			protected IStatus run(IProgressMonitor monitor) {
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					// Ignored
-				}
-
-				if (monitor.isCanceled()) {
-					Display.getDefault().syncExec(new Runnable() {
-						@Override
-						public void run() {
-							setToggledState(false); // small bug: this set state to false when it could have already been put back to true
-						}
-					});
-					// Stop here to cancel the repeating job
-					return Status.OK_STATUS;
-				}
-
-				doWork();
-
-				schedule();
-
-				return Status.OK_STATUS;
-			}
-		};
-		fPollingJob.schedule();
+		// Global TODO: Polling was removed, so "method:line" are shown only once,
+		//              which is when user enables the FrameSpy.
+		//              You should print "method:line" again, each time the execution
+		//              of the program stops.  Follow the steps below.
+		//              Don't hesitate to refactor the existing code.
+		
+		doWork();
 	}
 
 	private void cancelPollingJob() {
-		if (fPollingJob != null) {
-			fPollingJob.cancel();
-		}
 	}
 	
 	private void doWork() {
@@ -166,6 +137,11 @@ public class FrameSpyView extends ViewPart {
 			return;
 		}
 
+		// TODO: Register to receive events from the proper session.
+		
+		// TODO: Don't forget to handle the case when the FrameSpy is disabled,
+		//       in which case we don't want to print anymore.
+		
 		session.getExecutor().submit(new DsfRunnable() {
 			@Override
 			public void run() {
@@ -221,4 +197,7 @@ public class FrameSpyView extends ViewPart {
 			}
 		});	
 	}
+	
+	// TODO: Write new method to receive appropriate event and print "method:line"
+	//       Even more advanced: make it work for both non-stop and all-stop
 }
