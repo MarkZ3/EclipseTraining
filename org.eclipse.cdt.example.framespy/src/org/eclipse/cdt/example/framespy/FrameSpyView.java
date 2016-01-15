@@ -12,9 +12,11 @@ package org.eclipse.cdt.example.framespy;
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
 import org.eclipse.cdt.dsf.concurrent.DsfRunnable;
 import org.eclipse.cdt.dsf.datamodel.IDMContext;
+import org.eclipse.cdt.dsf.debug.service.IRunControl.ISuspendedDMEvent;
 import org.eclipse.cdt.dsf.debug.service.IStack;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMData;
+import org.eclipse.cdt.dsf.service.DsfServiceEventHandler;
 import org.eclipse.cdt.dsf.service.DsfServicesTracker;
 import org.eclipse.cdt.dsf.service.DsfSession;
 import org.eclipse.core.runtime.IAdaptable;
@@ -37,6 +39,7 @@ public class FrameSpyView extends ViewPart {
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
 	private StyledText fLogText;
+	private DsfSession fSession;
 
 	public FrameSpyView() {
 	}
@@ -102,19 +105,6 @@ public class FrameSpyView extends ViewPart {
 	}
 
 	private void startPollingJob() {
-		// Global TODO: Polling was removed, so "method:line" are shown only once,
-		//              which is when user enables the FrameSpy.
-		//              You should print "method:line" again, each time the execution
-		//              of the program stops.  Follow the steps below.
-		//              Don't hesitate to refactor the existing code.
-		
-		doWork();
-	}
-
-	private void cancelPollingJob() {
-	}
-	
-	private void doWork() {
 		// Get the debug selection to know what the user is looking at in the Debug view
 		IAdaptable context = DebugUITools.getDebugContext();
 		if (context == null) {
@@ -137,32 +127,51 @@ public class FrameSpyView extends ViewPart {
 			return;
 		}
 
-		// TODO: Register to receive events from the proper session.
-		//       Use DsfSession#addServiceEventListener.
-		//
-		//       Check for any annotation on that method, and possibly
-		//       on its parent class (DsfSession) to know if you must
-		//       use the Executor to make this call.
-		//
-		//       You can use this class as the listener.  Be careful
-		//       what 'this' represents when you are submitting code to the
-		//       DSF Executor.
-
+		registerForEvents(session);
 		
-		// TODO: Don't forget to handle the case when the FrameSpy is disabled,
-		//       in which case we don't want to print anymore.
-		//       You can either:
-		//           1- skip actually printing when FrameSpy disabled
-		//           OR
-		//           2- un-register for events, since don't need them anymore
-		//              Use DsfSession#removeServiceEventListener for this.
+		// Show the current frame if there is one
+		logFrameInfo(session, dmcontext);
+	}
 
-		
+	/**
+	 * This method registers with the specified session to receive
+	 * DSF events.
+	 * @param session The session for which we want to receive events
+	 */
+	private void registerForEvents(DsfSession session) {
+		if (session != null) {
+			fSession = session;
+			fSession.getExecutor().submit(new DsfRunnable() {
+				@Override
+				public void run() {
+					fSession.addServiceEventListener(FrameSpyView.this, null);
+				}
+			});
+		}
+	}
+	
+	/**
+	 * This method un-registers from the specified session to stop
+	 * getting DSF events.
+	 * @param session The session from which we want to no longer receive events
+	 */
+	private void cancelPollingJob() {
+		if (fSession != null) {
+			fSession.getExecutor().submit(new DsfRunnable() {
+				@Override
+				public void run() {
+					fSession.removeServiceEventListener(FrameSpyView.this);
+				}
+			});			
+		}
+	}
+	
+	private void logFrameInfo(DsfSession session, IDMContext dmcontext) {
 		session.getExecutor().submit(new DsfRunnable() {
 			@Override
 			public void run() {
 				// Get Stack service using a DSF services tracker object
-				DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), sessionId);
+				DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), session.getId());
 				IStack stackService = tracker.getService(IStack.class);
 				// Don't forgot to dispose of a tracker before it does out of scope
 				tracker.dispose();
@@ -214,14 +223,30 @@ public class FrameSpyView extends ViewPart {
 		});	
 	}
 	
-	// TODO: Write new method to receive appropriate event and print "method:line"
-	//
-	//       Use @DsfServiceEventHandler for the new method.
-	//
-	//       Don't forget it must be public.
-	//
-	//       The event of interest for Non-Stop is ISuspendedDMEvent
-	//
-	//       When the event is received, you will need to fetch the frame info
-	//       as was done above and print the result.  Refactoring the code may be helpful.
+	// This method must be public for the DSF callback to be found
+	@DsfServiceEventHandler
+	public void eventReceived(ISuspendedDMEvent event) {
+		// Most DSF event have a DM context
+		IDMContext dmcontext = event.getDMContext();
+		if (dmcontext == null) {
+			return;
+		}
+		
+		// Extract DSF session id from the DM context
+		String sessionId = dmcontext.getSessionId();
+		// Get the full DSF session to have access to the DSF executor
+		DsfSession session = DsfSession.getSession(sessionId);
+
+		// This will only work in non-stop because it is in this mode
+		// we get a suspended event for a thread.
+		// In all-stop, the suspended event is for the whole process
+		// and processes don't contain frames.
+		
+		// TODO: Check if the event received is actually an
+		//       IContainerSuspendedDMEvent and if so,
+		//       call getTriggeringContexts()[0] to get the thread
+		//       for which we want the stack frame.
+		
+		logFrameInfo(session, dmcontext);
+	}
 }
