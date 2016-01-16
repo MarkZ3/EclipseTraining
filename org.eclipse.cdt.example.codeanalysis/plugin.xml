@@ -22,6 +22,16 @@
             class="org.eclipse.cdt.example.codeanalysis.ComplexityChecker"
             id="org.eclipse.cdt.example.codeanalysis.complexity"
             name="Complexity check">
+         <problem
+               category="org.eclipse.cdt.codan.core.categories.CodeStyle"
+               defaultEnabled="true"
+               defaultSeverity="Warning"
+               description="Complexity is too high"
+               id="org.eclipse.cdt.example.codeanalysis.problem1"
+               markerType="org.eclipse.cdt.codan.core.codanProblem"
+               messagePattern="Complexity is higher than {0}"
+               name="Complexity too high">
+         </problem>
       </checker>
    </extension>
 
