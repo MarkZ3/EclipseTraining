@@ -18,6 +18,11 @@
                name="File too long">
          </problem>
       </checker>
+      <checker
+            class="org.eclipse.cdt.example.codeanalysis.ComplexityChecker"
+            id="org.eclipse.cdt.example.codeanalysis.complexity"
+            name="Complexity check">
+      </checker>
    </extension>
 
 </plugin>
