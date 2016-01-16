@@ -21,6 +21,7 @@ public class ComplexityChecker extends AbstractIndexAstChecker {
 		public int visit(IASTStatement statement) {
 			if (isStatementIncreasingComplexity(statement)) {
 				level++;
+				System.out.println(level);
 			}
 			return super.visit(statement);
 		}
@@ -33,6 +34,7 @@ public class ComplexityChecker extends AbstractIndexAstChecker {
 		public int leave(IASTStatement statement) {
 			if (isStatementIncreasingComplexity(statement)) {
 				level--;
+				System.out.println(level);
 			}
 			return super.leave(statement);
 		}
