@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 import org.eclipse.cdt.codan.core.model.AbstractCheckerWithProblemPreferences;
+import org.eclipse.cdt.codan.core.model.IProblem;
 import org.eclipse.cdt.codan.core.model.IProblemWorkingCopy;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
@@ -13,14 +14,16 @@ import org.eclipse.core.runtime.OperationCanceledException;
 
 public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 
-	final static String FILE_TOO_LONG_PROBLEM_ID = "org.eclipse.cdt.example.codeanalysis.toolong";
+	private static final String FILE_TOO_LONG_PROBLEM_ID = "org.eclipse.cdt.example.codeanalysis.toolong";
+	private static final int MAX_LINE_COUNT_DEFAULT = 500;
+	private static final String PARAM_MAX_LINE_COUNT = "maxlinecount"; //$NON-NLS-1$
 	
 	@Override
 	public boolean processResource(IResource resource) throws OperationCanceledException {
 		if (!shouldProduceProblems(resource)) {
 			return false;
 		}
-		
+
 		if (resource instanceof IFile) {
 			IFile file = (IFile) resource;
 			processFile(file);
@@ -31,14 +34,14 @@ public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 	
 	private void processFile(IFile file) {
 		try (BufferedReader bis = new BufferedReader(new InputStreamReader(file.getContents()))) {
-			
+
 			String line;
 			int numLines = 0;
 			while ((line = bis.readLine()) != null) {
 				numLines++;
 			}
-			
-			if (numLines > 100) {
+
+			if (numLines > getMaxLineCount(file)) {
 				reportProblem(FILE_TOO_LONG_PROBLEM_ID, file, 1);
 			}
 		} catch (IOException e) {
@@ -47,17 +50,22 @@ public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 			// ignore
 		}
 	}
-	
+
 	private int getMaxLineCount(IFile file) {
-		//TODO: Call getProblemById to get the problem
-		//TODO: Call getPreference to get a given preference for that problem
-		int maxLineCount = 0;
-		return 0;
+		final IProblem problem = getProblemById(FILE_TOO_LONG_PROBLEM_ID, file);
+		String parameter = (String) getPreference(problem, PARAM_MAX_LINE_COUNT);
+		int maxLineCount = MAX_LINE_COUNT_DEFAULT;
+		try {
+				maxLineCount = Integer.parseInt(parameter);
+		} catch (NumberFormatException e) {
+			// User input something invalid, continue with default
+		}
+		return maxLineCount;
 	}
 
 	@Override
 	public void initPreferences(IProblemWorkingCopy problem) {
 		super.initPreferences(problem);
-		//TODO: Call addPreference(IProblemWorkingCopy, String, ...) to let the framework and UI be aware of the preference
+		addPreference(problem, PARAM_MAX_LINE_COUNT, "Max line count", Integer.toString(MAX_LINE_COUNT_DEFAULT)); //$NON-NLS-1$
 	}
 }
