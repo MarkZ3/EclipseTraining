@@ -14,7 +14,7 @@
                description="File is too long"
                id="org.eclipse.cdt.example.codeanalysis.toolong"
                markerType="org.eclipse.cdt.codan.core.codanProblem"
-               messagePattern="File is too long"
+               messagePattern="File is longer than {0} lines"
                name="File too long">
          </problem>
       </checker>

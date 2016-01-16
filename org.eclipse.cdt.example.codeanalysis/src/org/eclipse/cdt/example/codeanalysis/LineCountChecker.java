@@ -42,7 +42,7 @@ public class LineCountChecker extends AbstractCheckerWithProblemPreferences {
 			}
 
 			if (numLines > getMaxLineCount(file)) {
-				reportProblem(FILE_TOO_LONG_PROBLEM_ID, file, 1);
+				reportProblem(FILE_TOO_LONG_PROBLEM_ID, file, 1, getMaxLineCount(file));
 			}
 		} catch (IOException e) {
 			// ignore
