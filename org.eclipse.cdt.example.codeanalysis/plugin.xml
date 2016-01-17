@@ -27,7 +27,7 @@
                defaultEnabled="true"
                defaultSeverity="Warning"
                description="Complexity is too high"
-               id="org.eclipse.cdt.example.codeanalysis.problem1"
+               id="org.eclipse.cdt.example.codeanalysis.highcomplexity"
                markerType="org.eclipse.cdt.codan.core.codanProblem"
                messagePattern="Complexity is higher than {0}"
                name="Complexity too high">
