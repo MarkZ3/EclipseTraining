@@ -33,6 +33,11 @@
                name="Complexity too high">
          </problem>
       </checker>
+      <checker
+            class="org.eclipse.cdt.example.codeanalysis.ReturnTypeChecker"
+            id="org.eclipse.cdt.example.codeanalysis.returntype"
+            name="Return type">
+      </checker>
    </extension>
 
 </plugin>
