@@ -9,31 +9,18 @@
 
 package org.eclipse.cdt.example.framespy;
 
-public class FrameSpyService {
+import org.eclipse.cdt.dsf.service.AbstractDsfService;
+import org.eclipse.cdt.dsf.service.DsfSession;
+import org.osgi.framework.BundleContext;
 
-	// Global TODO: Make this class into a DSF service that provides 
-	//              a synchronous method
-	//                   getLocalTimeOfDayString();
-	//              which synchronously returns 
-	//                   new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
-	//              and an asynchronous method
-	//                   getTargetTimeOfDayString(DataRequestMonitor<> rm);
-	//              which should still use (for simplicity)
-	//                   new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+public class FrameSpyService extends AbstractDsfService {
 
-	//              Look at any existing DSF-GDB service to guide you.
-	
-	// TODO: Find the abstract base class to have FrameSpyService extend
-    //	     You can find the BundleContext using Activator.getBundleContext()
-	
-	// TODO: You must call the base class's register() method so the service
-	//       can be found by others.
-	//       Look at another service to see when and how register() is called,
-	//       within the initialization() asynchronous method.
-	//       You can use the service's class name as it registered name.
-	
-	// TODO: Provide the String getLocalTimeOfDayString(); as required above 
+	public FrameSpyService(DsfSession session) {
+		super(session);
+	}
 
-    // TODO: Provide an asynchronous getTargetTimeOfDayString(DataRequestMonitor<> rm);
-	//       as described above
+	@Override
+	protected BundleContext getBundleContext() {
+		return Activator.getBundleContext();
+	}
 }
