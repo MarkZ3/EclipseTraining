@@ -30,6 +30,11 @@ public class ReturnTypeChecker extends AbstractIndexAstChecker {
 
 		private void checkConflictingReturn(ICPPMethod methodChecked, IASTNode node) {
 			ICPPMethod[] baseMethods = getAllBaseMethods(methodChecked.getClassOwner());
+			for (ICPPMethod baseMethod : baseMethods) {
+				if (baseMethod.isVirtual() && methodChecked.getName().equals(baseMethod.getName())) {
+					// Check that the return type is the same
+				}
+			}
 		}
 
 		/**
