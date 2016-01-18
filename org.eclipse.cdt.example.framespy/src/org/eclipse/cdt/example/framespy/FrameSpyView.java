@@ -9,6 +9,9 @@
 
 package org.eclipse.cdt.example.framespy;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
 import org.eclipse.cdt.dsf.concurrent.DsfRunnable;
 import org.eclipse.cdt.dsf.datamodel.IDMContext;
@@ -42,7 +45,7 @@ public class FrameSpyView extends ViewPart {
 	private static final String TOGGLE_STATE_PREF_KEY = "toggle.state";
 	private MenuManager fMenuManager;
 	private StyledText fLogText;
-	private DsfSession fSession;
+	private Set<DsfSession> fSessionSet = new HashSet<>();
 
 	public FrameSpyView() {
 	}
@@ -63,23 +66,24 @@ public class FrameSpyView extends ViewPart {
 		// Display the new state to the user
 		boolean toggledState = getToggledState();
 		fLogText.setText(Boolean.toString(toggledState));
-		
-		// Global TODO: Register to get notified when a new DSF session starts.
-		
-		// TODO: Use the static method DsfSession.addSessionStartedListener()
-		//       For the listener you can use the one created below for you: fStartedListener
-				
+
+		// Register to know about all new DSF sessions
+		DsfSession.addSessionStartedListener(fStartedListener);
+
 		// Create the polling job if the spy is enabled
 		if (toggledState) {
 			startPollingJob();
 		}
 	}
-
+	
 	private SessionStartedListener fStartedListener = new SessionStartedListener() {
 		@Override
 		public void sessionStarted(DsfSession session) {
-			// TODO If the FrameSpy is enabled then register for events
-			// in the new session we just were told about
+			// If the FrameSpy is enabled, register for events
+			// in the new session
+			if (getToggledState()) {
+				registerForEvents(session);
+			}
 		}
 	};
 
@@ -92,11 +96,7 @@ public class FrameSpyView extends ViewPart {
 	public void dispose() {
 		super.dispose();
 		fMenuManager.dispose();
-		
-		// TODO: When the view is removed, avoid memory leaks by removing 
-		//       your sessionStartedListener.  Use
-		//           DsfSession.removeSessionStartedListener
-		//       using the listener in question
+		DsfSession.removeSessionStartedListener(fStartedListener);
 	}
 
 	public boolean getToggledState() {
@@ -162,16 +162,11 @@ public class FrameSpyView extends ViewPart {
 	 */
 	private void registerForEvents(DsfSession session) {
 		if (session != null) {
-			// TODO: You will need to keep track of _all_ sessions you are
-			//       registering for, not just one.  This is important
-			//       so you can unregister each of them when FrameSpy
-			//       gets disabled.
-			//       You can use a HashSet<DsfSession> as a new type for fSession
-			fSession = session;
-			fSession.getExecutor().submit(new DsfRunnable() {
+			fSessionSet.add(session);
+			session.getExecutor().submit(new DsfRunnable() {
 				@Override
 				public void run() {
-					fSession.addServiceEventListener(FrameSpyView.this, null);
+					session.addServiceEventListener(FrameSpyView.this, null);
 				}
 			});
 		}
@@ -183,15 +178,15 @@ public class FrameSpyView extends ViewPart {
 	 * @param session The session from which we want to no longer receive events
 	 */
 	private void cancelPollingJob() {
-		// TODO: You must unregister from each session you registered for.
-		//       Use a for loop to go over the entire Set of session
-		if (fSession != null) {
-			fSession.getExecutor().submit(new DsfRunnable() {
-				@Override
-				public void run() {
-					fSession.removeServiceEventListener(FrameSpyView.this);
-				}
-			});			
+		for (DsfSession session : fSessionSet) {
+			if (DsfSession.isSessionActive(session.getId())) {
+				session.getExecutor().submit(new DsfRunnable() {
+					@Override
+					public void run() {
+						session.removeServiceEventListener(FrameSpyView.this);
+					}
+				});
+			}
 		}
 	}
 	
