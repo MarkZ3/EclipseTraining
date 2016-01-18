@@ -197,6 +197,7 @@ public class FrameSpyView extends ViewPart {
 				// Get Stack service using a DSF services tracker object
 				DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), session.getId());
 				IStack stackService = tracker.getService(IStack.class);
+				FrameSpyService spyService = tracker.getService(FrameSpyService.class);
 				// Don't forgot to dispose of a tracker before it does out of scope
 				tracker.dispose();
 
@@ -220,16 +221,8 @@ public class FrameSpyView extends ViewPart {
 								// We have the frame data, let's print the method name and line number
 								final IFrameDMData frameData = getData();
 
-								//Global TODO: Get the time of day using the synchronous method in new service
-								
-								// TODO: Fetch the service using DsfServicesTracker (either a new one
-								//       or fetch the service higher up when you already have a tracker)
-								
-								// TODO: Call the service using the synchronous method for simplicity
-								//       and pre-pend the time of day result in your printout below.
-								//
-								// NOTE: It is normal, for now, that the tracker cannot find the service
-								//       But let's still write the code in preparation.
+								String time = spyService.getLocalTimeOfDayString();
+
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
@@ -239,6 +232,7 @@ public class FrameSpyView extends ViewPart {
 										}
 										// Pre-pend the current method:line to the log
 										fLogText.setText(
+												"[" + time + "] " +
 												frameData.getFunction() + ":" + frameData.getLine() + "\n" +
 														fLogText.getText());
 									}
