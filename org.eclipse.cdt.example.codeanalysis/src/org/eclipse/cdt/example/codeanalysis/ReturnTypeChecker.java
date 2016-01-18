@@ -3,6 +3,7 @@ package org.eclipse.cdt.example.codeanalysis;
 import org.eclipse.cdt.codan.core.cxx.model.AbstractIndexAstChecker;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
+import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
@@ -27,15 +28,8 @@ public class ReturnTypeChecker extends AbstractIndexAstChecker {
 			return super.visit(declarator);
 		}
 
-		private void checkConflictingReturn(ICPPMethod methodChecked, IASTDeclarator declarator) {
-			// TODO: Get the class type of this method. i.e. the 'owner'
-			// TODO: Get all the base methods of this class using getAllBaseMethods
-			
-			// TODO: for each method
-			//    - if the method is virtual
-			//    - check if the name (getName) is equal to the methodChecked name
-			//    - check if the return type is not the same (so that it can be reported
- 
+		private void checkConflictingReturn(ICPPMethod methodChecked, IASTNode node) {
+			ICPPMethod[] baseMethods = getAllBaseMethods(methodChecked.getClassOwner());
 		}
 
 		/**
