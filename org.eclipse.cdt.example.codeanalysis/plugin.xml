@@ -37,6 +37,16 @@
             class="org.eclipse.cdt.example.codeanalysis.ReturnTypeChecker"
             id="org.eclipse.cdt.example.codeanalysis.returntype"
             name="Return type">
+         <problem
+               category="org.eclipse.cdt.codan.core.categories.CompilerErrors"
+               defaultEnabled="true"
+               defaultSeverity="Error"
+               description="Detects when return type is incompatible with overriden method"
+               id="org.eclipse.cdt.example.codeanalysis.returntypeinvalid"
+               markerType="org.eclipse.cdt.codan.core.codanSemanticProblem"
+               messagePattern="Invalid return type for overriden method. Return type should be &apos;&apos;{0}&apos;&apos;"
+               name="Invalid return type">
+         </problem>
       </checker>
    </extension>
 

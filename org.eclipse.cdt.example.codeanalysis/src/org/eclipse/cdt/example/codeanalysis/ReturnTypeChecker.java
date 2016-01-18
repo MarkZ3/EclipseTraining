@@ -1,6 +1,7 @@
 package org.eclipse.cdt.example.codeanalysis;
 
 import org.eclipse.cdt.codan.core.cxx.model.AbstractIndexAstChecker;
+import org.eclipse.cdt.core.dom.ast.ASTTypeUtil;
 import org.eclipse.cdt.core.dom.ast.ASTVisitor;
 import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
@@ -15,6 +16,7 @@ import org.eclipse.cdt.internal.core.dom.parser.cpp.ClassTypeHelper;
 public class ReturnTypeChecker extends AbstractIndexAstChecker {
 
 	private final class MethodDeclaratorVisitor extends ASTVisitor {
+		private static final String RETURN_TYPE_INVALID_PROBLEM = "org.eclipse.cdt.example.codeanalysis.returntypeinvalid";
 
 		{
 			shouldVisitDeclarators = true;
@@ -35,7 +37,7 @@ public class ReturnTypeChecker extends AbstractIndexAstChecker {
 				if (baseMethod.isVirtual() && methodChecked.getName().equals(baseMethod.getName())) {
 					IType returnType = baseMethod.getType().getReturnType();
 					if (!methodChecked.getType().getReturnType().isSameType(returnType)) {
-						//TODO: report problem
+						reportProblem(RETURN_TYPE_INVALID_PROBLEM, node, ASTTypeUtil.getType(returnType));
 						return;
 					}
 				}
