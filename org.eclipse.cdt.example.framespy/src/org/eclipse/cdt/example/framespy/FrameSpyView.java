@@ -201,8 +201,8 @@ public class FrameSpyView extends ViewPart {
 				// Don't forgot to dispose of a tracker before it does out of scope
 				tracker.dispose();
 
-				if (stackService == null) {
-					// Stack service not available.  The debug session
+				if (stackService == null || spyService == null) {
+					// Service not available.  The debug session
 					// is probably terminating.
 					return;
 				}
@@ -221,30 +221,35 @@ public class FrameSpyView extends ViewPart {
 								// We have the frame data, let's print the method name and line number
 								final IFrameDMData frameData = getData();
 
+								// First get the timestamp
 								String time = spyService.getLocalTimeOfDayString();
 								
-								// TODO: Make an async call to spyService.getNumberArguments
-								//       Pass a new DataRequestMonitor
-								//       Override handleSuccess and inside, use getData() to
-								//       get the number of arguments.
-								
-								// TODO: Add the number of arguments to the printout.
-								
-								Display.getDefault().asyncExec(new Runnable() {
-									@Override
-									public void run() {
-										if (fLogText.getText().length() > MAX_LOG_SIZE) {
-											// Clear half the log when too big
-											fLogText.setText(fLogText.getText().substring(MAX_LOG_SIZE));
+								// Second, get the number of arguments to add that information
+								spyService.getNumberArguments(
+									frame, 
+									new DataRequestMonitor<Integer>(session.getExecutor(), null) {
+										@Override
+										protected void handleSuccess() {
+											String numArgs = getData().toString();
+													
+											Display.getDefault().asyncExec(new Runnable() {
+												@Override
+												public void run() {
+													if (fLogText.getText().length() > MAX_LOG_SIZE) {
+														// Clear half the log when too big
+														fLogText.setText(fLogText.getText().substring(MAX_LOG_SIZE));
+													}
+													// Pre-pend the current "[time]method:line (num args)" to the log
+													fLogText.setText(
+															"[" + time + "] "
+															+ frameData.getFunction() + ":" 
+															+ frameData.getLine() + " (" + numArgs + " args)" 
+															+ "\n" + fLogText.getText());
+												}
+											});
 										}
-										// Pre-pend the current method:line to the log
-										fLogText.setText(
-												"[" + time + "] " +
-												frameData.getFunction() + ":" + frameData.getLine() + "\n" +
-														fLogText.getText());
-									}
-								});								
-							}
+									});
+								}
 						});
 					}
 					

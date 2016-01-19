@@ -14,9 +14,15 @@ import java.util.Calendar;
 import java.util.Hashtable;
 
 import org.eclipse.cdt.dsf.concurrent.DataRequestMonitor;
+import org.eclipse.cdt.dsf.concurrent.IDsfStatusConstants;
 import org.eclipse.cdt.dsf.concurrent.RequestMonitor;
+import org.eclipse.cdt.dsf.debug.service.IStack;
+import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
+import org.eclipse.cdt.dsf.debug.service.IStack.IVariableDMContext;
 import org.eclipse.cdt.dsf.service.AbstractDsfService;
 import org.eclipse.cdt.dsf.service.DsfSession;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
 
 public class FrameSpyService extends AbstractDsfService {
@@ -62,29 +68,21 @@ public class FrameSpyService extends AbstractDsfService {
 		rm.done(new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()));
 	}
 	
-	// Global TODO: Add a method to get the number of arguments for a particular frame.
-	//              Call IStack to get the list of arguments for that frame.
-	//              Update FrameSpyView to use this info to show
-	//                 [time] method:line (# args)
-	
-	// TODO: Create a new method that can be called to get the number
-	//       of arguments of a specified frame.
-	//       You will be calling IStack#getArguments which is an asynchronous
-	//       API; this means your method must be asynchronous.
-	//
-	//       Your method should
-	//          - return void
-	//          - take a IFrameDMContext as a parameter
-	//          - take a DataRequestMonitor as a param to 'return' the number of args
-	
-	// TODO: In that method, call 
-	//            IStack#getArguments(IFrameDMContext, DataRequestMonitor<IVariableDMContext[]>);
-	//       Create a new DataRequestMonitor to pass to this call.
-	
-	// TODO: Override the handleSuccess() method of the DataRequestMonitor
-	//       you are passing to IStack#getArguments.  In that handleSuccess() use 
-	//       getData() to get the list of arguments; then count them and put the
-	//       result in the DataRequestMonitor that was passed to your own method.
-
-	// TODO: Go to FrameSpyView.java and use this new API as described in that file.
+	public void getNumberArguments(IFrameDMContext frame, DataRequestMonitor<Integer> rm) {
+		IStack stackService = getServicesTracker().getService(IStack.class);
+		if (stackService == null) {
+    		rm.done(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, 
+    				"Cannot find command control service", null));
+    		return;
+		}
+		
+		stackService.getArguments(
+				frame, 
+				new DataRequestMonitor<IVariableDMContext[]>(getExecutor(), rm) {
+			@Override
+			protected void handleSuccess() {
+				rm.done(getData().length);
+			}
+		});
+	}
 }
