@@ -9,14 +9,9 @@
 
 package org.eclipse.cdt.example.framespy;
 
-import org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate;
-
-public class FrameSpyLaunchDelegate extends GdbLaunchDelegate {
-
-	@Override
-	protected String getPluginID() {
-		return Activator.PLUGIN_ID;
-	}
+public class FrameSpyServicesFactory {
 	
-	// TODO: Override newServiceFactory() to return FrameSpyServivcesFactory
+	// TODO: Have this services factory extend GdbDebugServicesFactory
+	
+	// TODO: Override createStackService() to return FrameSpyStackService
 }
