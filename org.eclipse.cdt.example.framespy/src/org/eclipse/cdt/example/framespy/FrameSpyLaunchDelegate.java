@@ -9,7 +9,9 @@
 
 package org.eclipse.cdt.example.framespy;
 
+import org.eclipse.cdt.dsf.debug.service.IDsfDebugServicesFactory;
 import org.eclipse.cdt.dsf.gdb.launching.GdbLaunchDelegate;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 public class FrameSpyLaunchDelegate extends GdbLaunchDelegate {
 
@@ -18,5 +20,8 @@ public class FrameSpyLaunchDelegate extends GdbLaunchDelegate {
 		return Activator.PLUGIN_ID;
 	}
 	
-	// TODO: Override newServiceFactory() to return FrameSpyServivcesFactory
+	@Override
+	protected IDsfDebugServicesFactory newServiceFactory(ILaunchConfiguration config, String version) {
+		return new FrameSpyServicesFactory(version);
+	}
 }

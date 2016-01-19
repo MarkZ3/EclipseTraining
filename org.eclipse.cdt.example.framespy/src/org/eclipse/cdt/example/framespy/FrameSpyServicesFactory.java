@@ -9,9 +9,17 @@
 
 package org.eclipse.cdt.example.framespy;
 
-public class FrameSpyServicesFactory {
+import org.eclipse.cdt.dsf.debug.service.IStack;
+import org.eclipse.cdt.dsf.gdb.service.GdbDebugServicesFactory;
+import org.eclipse.cdt.dsf.service.DsfSession;
+
+public class FrameSpyServicesFactory extends GdbDebugServicesFactory {
+	public FrameSpyServicesFactory(String version) {
+		super(version);
+	}
 	
-	// TODO: Have this services factory extend GdbDebugServicesFactory
-	
-	// TODO: Override createStackService() to return FrameSpyStackService
+	@Override
+	protected IStack createStackService(DsfSession session) {
+		return new FrameSpyStackService(session);
+	}
 }
