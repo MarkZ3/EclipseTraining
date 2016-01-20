@@ -19,6 +19,9 @@ import org.eclipse.cdt.dsf.concurrent.RequestMonitor;
 import org.eclipse.cdt.dsf.debug.service.IStack;
 import org.eclipse.cdt.dsf.debug.service.IStack.IFrameDMContext;
 import org.eclipse.cdt.dsf.debug.service.IStack.IVariableDMContext;
+import org.eclipse.cdt.dsf.debug.service.command.ICommandControlService;
+import org.eclipse.cdt.dsf.mi.service.command.commands.MIGDBSet;
+import org.eclipse.cdt.dsf.mi.service.command.output.MIInfo;
 import org.eclipse.cdt.dsf.service.AbstractDsfService;
 import org.eclipse.cdt.dsf.service.DsfSession;
 import org.eclipse.core.runtime.IStatus;
@@ -86,21 +89,17 @@ public class FrameSpyService extends AbstractDsfService {
 		});
 	}
 	
-	// Global TODO: Write a new public method called setVerbose.
-	//              This method should send -gdb-set verbose on to GDB.
-	//
-	// TODO: Think about what type of API you should use for the method.
-	//       Remember that sending things to GDB is slow and should not block.
+	public void setVerbose(boolean enabled, RequestMonitor rm) {
+		ICommandControlService controlService = getServicesTracker().getService(ICommandControlService.class);
+		if (controlService == null) {
+    		rm.done(new Status(IStatus.ERROR, Activator.PLUGIN_ID, IDsfStatusConstants.INTERNAL_ERROR, 
+    				"Cannot find command control service", null));
+    		return;
+		}
 
-	// TODO: You send commands to GDB with ICommandControlService.queueCommand()
-	//       Use getServicesTracker().getService() to fetch the ICommandControl service.
-	
-	// TODO: Create a new MIGDBSet command with the necessary parameters for it to
-	//       be "-gdb-set verbose on" or "-gdb-set verbose off".
-	//       You should use ICommandControlService.getContext() as the first parameter;
-	//       this context represents GDB itself.
-	
-	// TODO: Call ICommandControlService.queueCommand() passing it:
-	//         1- the MIGDBSet command you created
-	//         2- a DataRequestMonitor as it expects
+		String enabledString = enabled ? "on" : "off";
+		controlService.queueCommand(
+				new MIGDBSet(controlService.getContext(), new String[] { "verbose", enabledString }),
+				new DataRequestMonitor<MIInfo>(getExecutor(), rm));
+	}
 }
