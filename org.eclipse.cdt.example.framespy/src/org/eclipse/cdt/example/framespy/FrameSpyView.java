@@ -125,6 +125,8 @@ public class FrameSpyView extends ViewPart {
 			}
 			
 			private void doWork() {
+				// Global TODO: Replace printing the counter with printing <method:line> for the current frame
+				//              by doing the steps shown further down.
 				Display.getDefault().asyncExec(new Runnable() {
 					@Override
 					public void run() {
@@ -132,6 +134,14 @@ public class FrameSpyView extends ViewPart {
 					}
 				});
 				counter++;
+				
+				// Get the debug selection to know what the user is looking at in the Debug view				
+				// TODO: Obtain current debug context using DebugUITools.getDebugContext();
+
+				// Extract the data model context to use with the DSF services
+				// TODO: Convert debug context to DSF context using: getAdapter(IDMContext.class)
+				
+				// TODO: Fetch the <method:line> information and print it
 			}
 		};
 		fPollingJob.schedule();
