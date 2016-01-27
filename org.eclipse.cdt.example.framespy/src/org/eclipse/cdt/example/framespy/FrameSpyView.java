@@ -134,14 +134,39 @@ public class FrameSpyView extends ViewPart {
 					}
 				});
 				counter++;
-				
+
 				// Get the debug selection to know what the user is looking at in the Debug view				
 				// TODO: Obtain current debug context using DebugUITools.getDebugContext();
 
 				// Extract the data model context to use with the DSF services
 				// TODO: Convert debug context to DSF context using: getAdapter(IDMContext.class)
 				
-				// TODO: Fetch the <method:line> information and print it
+				// Extract DSF session id from the DM context
+				// TODO: Get DsfSession using DsfSession.getSession
+				//       You can find the session id in the IDMContext
+
+				// Get Stack service using a DSF services tracker object
+				// TODO: Create a new DsfServicesTracker (pass in Activator.getBundleContext())
+				
+				// TODO: Get the IStack service using DsfServicesTracker.getService(IStack.class)
+
+				// TODO: Don't forget to dispose of the tracker before it goes out of scope
+
+				// Get the context for the top frame
+				// TODO: Look at IStack.java and find the API to get the top frame
+				// TODO: Call that method using the IDMContext you have already.
+				//       You can use 'null' for the parentRequest monitor
+				//       You can find the DSF Executor using the DsfSession and getExecutor()
+				
+				// TODO: Override handleSuccess() which is the callback
+				//       The result will be in getData()
+				
+				// We now have a pointer to the top frame, but no other information about it
+				// Call the stack service to fetch that information so we can print it
+				// TODO: Look at IStack.java and find the API to get the data associated with a frame
+				
+				// TODO: From the handleSucess() callback extract from the frame data
+				//       the 'method name' and the 'line number' and set it as the text of fToggledStateLbl
 			}
 		};
 		fPollingJob.schedule();
