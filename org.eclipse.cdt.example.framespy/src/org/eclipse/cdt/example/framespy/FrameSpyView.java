@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- *
+ * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -138,9 +138,25 @@ public class FrameSpyView extends ViewPart {
 		}
 
 		// TODO: Register to receive events from the proper session.
+		//       Use DsfSession#addServiceEventListener.
+		//
+		//       Check for any annotation on that method, and possibly
+		//       on its parent class (DsfSession) to know if you must
+		//       use the Executor to make this call.
+		//
+		//       You can use this class as the listener.  Be careful
+		//       what 'this' represents when you are submitting code to the
+		//       DSF Executor.
+
 		
 		// TODO: Don't forget to handle the case when the FrameSpy is disabled,
 		//       in which case we don't want to print anymore.
+		//       You can either:
+		//           1- skip actually printing when FrameSpy disabled
+		//           OR
+		//           2- un-register for events, since don't need them anymore
+		//              Use DsfSession#removeServiceEventListener for this.
+
 		
 		session.getExecutor().submit(new DsfRunnable() {
 			@Override
@@ -199,5 +215,13 @@ public class FrameSpyView extends ViewPart {
 	}
 	
 	// TODO: Write new method to receive appropriate event and print "method:line"
-	//       Even more advanced: make it work for both non-stop and all-stop
+	//
+	//       Use @DsfServiceEventHandler for the new method.
+	//
+	//       Don't forget it must be public.
+	//
+	//       The event of interest for Non-Stop is ISuspendedDMEvent
+	//
+	//       When the event is received, you will need to fetch the frame info
+	//       as was done above and print the result.  Refactoring the code may be helpful.
 }
