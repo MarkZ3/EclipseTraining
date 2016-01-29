@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -62,6 +62,19 @@ public class FrameSpyView extends ViewPart {
 		// Display the new state to the user
 		boolean toggledState = getToggledState();
 		fLogText.setText(Boolean.toString(toggledState));
+		
+		// Global TODO: Register to get notified when a new DSF session starts.
+		//              Look at the DsfSession class for the necessary static method.
+		//
+		//              When listener is called, register for events of the new session.
+		//
+		//              Don't forget that we should only print if FrameSpy is enabled.
+		//
+		//              Since we use removeServiceEventListener() to stop printing
+		//              when the FrameSpy gets disabled,
+		//              you will need to keep track of _all_ sessions you are
+		//              registered for, so you can unregister each of them.
+		
 		// Create the polling job if the spy is enabled
 		if (toggledState) {
 			startPollingJob();
