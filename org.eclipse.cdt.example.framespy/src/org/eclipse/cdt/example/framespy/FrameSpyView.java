@@ -222,7 +222,14 @@ public class FrameSpyView extends ViewPart {
 								final IFrameDMData frameData = getData();
 
 								String time = spyService.getLocalTimeOfDayString();
-
+								
+								// TODO: Make an async call to spyService.getNumberArguments
+								//       Pass a new DataRequestMonitor
+								//       Override handleSuccess and inside, use getData() to
+								//       get the number of arguments.
+								
+								// TODO: Add the number of arguments to the printout.
+								
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {

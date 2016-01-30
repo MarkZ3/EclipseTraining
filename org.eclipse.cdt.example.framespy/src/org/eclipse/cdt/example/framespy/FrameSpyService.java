@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -66,4 +66,25 @@ public class FrameSpyService extends AbstractDsfService {
 	//              Call IStack to get the list of arguments for that frame.
 	//              Update FrameSpyView to use this info to show
 	//                 [time] method:line (# args)
+	
+	// TODO: Create a new method that can be called to get the number
+	//       of arguments of a specified frame.
+	//       You will be calling IStack#getArguments which is an asynchronous
+	//       API; this means your method must be asynchronous.
+	//
+	//       Your method should
+	//          - return void
+	//          - take a IFrameDMContext as a parameter
+	//          - take a DataRequestMonitor as a param to 'return' the number of args
+	
+	// TODO: In that method, call 
+	//            IStack#getArguments(IFrameDMContext, DataRequestMonitor<IVariableDMContext[]>);
+	//       Create a new DataRequestMonitor to pass to this call.
+	
+	// TODO: Override the handleSuccess() method of the DataRequestMonitor
+	//       you are passing to IStack#getArguments.  In that handleSuccess() use 
+	//       getData() to get the list of arguments; then count them and put the
+	//       result in the DataRequestMonitor that was passed to your own method.
+
+	// TODO: Go to FrameSpyView.java and use this new API as described in that file.
 }
