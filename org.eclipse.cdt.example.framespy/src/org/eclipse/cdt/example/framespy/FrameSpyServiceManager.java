@@ -27,9 +27,14 @@ public class FrameSpyServiceManager {
 	}
 
 	public static void initialize() {
+		// TODO: Register with DsfSession.addSessionStartedListener
+		//       Have this class implement the correct interface to
+		//       be the listener for Session started calls.
 	}
 
 	public static void dispose() {
 	}
 
+	// TODO: Implement sessionStarted() method inherited from SessionStartedListener
+	//       Instantiate and initialize FrameSpyService in this new method.
 }
