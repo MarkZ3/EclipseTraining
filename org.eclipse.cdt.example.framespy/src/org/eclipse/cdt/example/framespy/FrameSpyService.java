@@ -17,12 +17,23 @@ public class FrameSpyService {
 	//              which synchronously returns 
 	//                   new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
 	//              and an asynchronous method
-	//                   getTargetTimeOfDayString();
+	//                   getTargetTimeOfDayString(DataRequestMonitor<> rm);
 	//              which should still use (for simplicity)
 	//                   new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
 
-	// TODO: Look at any existing DSF-GDB service to guide you.
+	//              Look at any existing DSF-GDB service to guide you.
 	
-	// TODO: Don't forget to register the service so it can be found
-	//       using a DsfServicesTracker	
+	// TODO: Find the abstract base class to have FrameSpyService extend
+    //	     You can find the BundleContext using Activator.getBundleContext()
+	
+	// TODO: You must call the base class's register() method so the service
+	//       can be found by others.
+	//       Look at another service to see when and how register() is called,
+	//       within the initialization() asynchronous method.
+	//       You can use the service's class name as it registered name.
+	
+	// TODO: Provide the String getLocalTimeOfDayString(); as required above 
+
+    // TODO: Provide an asynchronous getTargetTimeOfDayString(DataRequestMonitor<> rm);
+	//       as described above
 }
