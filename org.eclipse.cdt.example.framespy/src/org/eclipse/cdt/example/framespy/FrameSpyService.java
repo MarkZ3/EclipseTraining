@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- *
+ * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -61,4 +61,9 @@ public class FrameSpyService extends AbstractDsfService {
 	public void getTargetTimeOfDayString(DataRequestMonitor<String> rm) {
 		rm.done(new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime()));
 	}
+	
+	// Global TODO: Add a method to get the number of arguments for a particular frame.
+	//              Call IStack to get the list of arguments for that frame.
+	//              Update FrameSpyView to use this info to show
+	//                 [time] method:line (# args)
 }
