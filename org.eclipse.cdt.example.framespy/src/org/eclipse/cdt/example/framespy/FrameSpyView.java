@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -220,6 +220,16 @@ public class FrameSpyView extends ViewPart {
 								// We have the frame data, let's print the method name and line number
 								final IFrameDMData frameData = getData();
 
+								//Global TODO: Get the time of day using the synchronous method in new service
+								
+								// TODO: Fetch the service using DsfServicesTracker (either a new one
+								//       or fetch the service higher up when you already have a tracker)
+								
+								// TODO: Call the service using the synchronous method for simplicity
+								//       and pre-pend the time of day result in your printout below.
+								//
+								// NOTE: It is normal, for now, that the tracker cannot find the service
+								//       But let's still write the code in preparation.
 								Display.getDefault().asyncExec(new Runnable() {
 									@Override
 									public void run() {
