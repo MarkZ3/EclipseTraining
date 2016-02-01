@@ -51,9 +51,48 @@
          </command>
       </menuContribution>
    </extension>
+ 
+   <extension
+         point="org.eclipse.debug.core.launchConfigurationTypes">
+<!--TODO id should be any unique string
+    TODO name will be shown to user, it should describe this launch config type-->
+      <launchConfigurationType
+TODO
+      	id=""
+      	name="">
+      </launchConfigurationType>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTypeImages">
+<!--TODO icon should be chip.png located in this plugin            
+    TODO configTypeID should be id of configuration defined above
+    TODO id should be any unique string -->
+      <launchConfigurationTypeImage
+TODO
+            icon=""
+            configTypeID=""
+            id="">
+      </launchConfigurationTypeImage>
+   </extension>
+   
+   <extension
+         point="org.eclipse.debug.ui.launchConfigurationTabGroups">
+<!--TODO id should be any unique string
+    TODO type should be id of configuration defined above-->
+      <launchConfigurationTabGroup
+TODO
+            class="org.eclipse.cdt.debug.internal.ui.launch.PlaceHolderLaunchConfigurationTabGroup"
+            id=""
+            type="">
+         <launchMode mode="debug"/>
+      </launchConfigurationTabGroup>
+   </extension>
 
     <extension point="org.eclipse.debug.core.launchDelegates">
+<!--TODO replace 'type' value below with new config id defined above-->
       <launchDelegate
+TODO
             delegate="org.eclipse.cdt.example.framespy.FrameSpyLaunchDelegate"
             delegateDescription="Local debugging for IMA2l type chips"
             id="org.eclipse.cdt.example.frameSpy.launchDelegate"
@@ -66,7 +105,9 @@
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
+<!--TODO replace 'group' value below with new tabGroup id defined above-->
       <tab
+TODO
             id="org.eclipse.cdt.example.frameSpy.localApplicationLaunch.mainTab"
             group="org.eclipse.cdt.launch.applicationLaunchTabGroup"
             name="Main"
