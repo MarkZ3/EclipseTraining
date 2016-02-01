@@ -54,9 +54,14 @@
 
     <extension point="org.eclipse.debug.core.launchDelegates">
       <launchDelegate
+            delegate="org.eclipse.cdt.example.framespy.FrameSpyLaunchDelegate"
+            delegateDescription="Local debugging for IMA2l type chips"
             id="org.eclipse.cdt.example.frameSpy.launchDelegate"
+            modes="debug"
+            name="IMA2l-Chip Local Launcher"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
-            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer">
+            sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
+            type="org.eclipse.cdt.launch.applicationLaunchType">
       </launchDelegate>
    </extension>
    <extension
