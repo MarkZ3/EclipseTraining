@@ -52,47 +52,37 @@
       </menuContribution>
    </extension>
  
-   <extension
+    <extension
          point="org.eclipse.debug.core.launchConfigurationTypes">
-<!--TODO id should be any unique string
-    TODO name will be shown to user, it should describe this launch config type-->
       <launchConfigurationType
-TODO
-      	id=""
-      	name="">
+            id="org.eclipse.cdt.example.frameSpy.localConfigType"
+            name="IMA2l-Chip Local Application"
+            public="true">
       </launchConfigurationType>
    </extension>
    
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTypeImages">
-<!--TODO icon should be chip.png located in this plugin            
-    TODO configTypeID should be id of configuration defined above
-    TODO id should be any unique string -->
       <launchConfigurationTypeImage
-TODO
-            icon=""
-            configTypeID=""
-            id="">
+            icon="chip.png"
+            configTypeID="org.eclipse.cdt.example.frameSpy.localConfigType"
+            id="org.eclipse.cdt.example.frameSpy.localConfigTypeImage">
       </launchConfigurationTypeImage>
    </extension>
    
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabGroups">
-<!--TODO id should be any unique string
-    TODO type should be id of configuration defined above-->
       <launchConfigurationTabGroup
-TODO
             class="org.eclipse.cdt.debug.internal.ui.launch.PlaceHolderLaunchConfigurationTabGroup"
-            id=""
-            type="">
+            helpContextId="org.eclipse.cdt.debug.ui.cdt_debugging_projects"
+            id="org.eclipse.cdt.example.frameSpy.launchTabGroup"
+            type="org.eclipse.cdt.example.frameSpy.localConfigType">
          <launchMode mode="debug"/>
       </launchConfigurationTabGroup>
    </extension>
-
+   
     <extension point="org.eclipse.debug.core.launchDelegates">
-<!--TODO replace 'type' value below with new config id defined above-->
       <launchDelegate
-TODO
             delegate="org.eclipse.cdt.example.framespy.FrameSpyLaunchDelegate"
             delegateDescription="Local debugging for IMA2l type chips"
             id="org.eclipse.cdt.example.frameSpy.launchDelegate"
@@ -100,16 +90,14 @@ TODO
             name="IMA2l-Chip Local Launcher"
             sourceLocatorId="org.eclipse.cdt.debug.core.sourceLocator"
             sourcePathComputerId="org.eclipse.cdt.debug.core.sourcePathComputer"
-            type="org.eclipse.cdt.launch.applicationLaunchType">
+            type="org.eclipse.cdt.example.frameSpy.localConfigType">
       </launchDelegate>
    </extension>
    <extension
          point="org.eclipse.debug.ui.launchConfigurationTabs">
-<!--TODO replace 'group' value below with new tabGroup id defined above-->
       <tab
-TODO
             id="org.eclipse.cdt.example.frameSpy.localApplicationLaunch.mainTab"
-            group="org.eclipse.cdt.launch.applicationLaunchTabGroup"
+            group="org.eclipse.cdt.example.frameSpy.launchTabGroup"
             name="Main"
             class="org.eclipse.cdt.dsf.gdb.internal.ui.launching.CMainTab">
         <associatedDelegate delegate="org.eclipse.cdt.example.frameSpy.launchDelegate"/>
