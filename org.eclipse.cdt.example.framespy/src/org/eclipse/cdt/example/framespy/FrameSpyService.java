@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- * 
+ *
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -89,8 +89,18 @@ public class FrameSpyService extends AbstractDsfService {
 	// Global TODO: Write a new public method called setVerbose.
 	//              This method should send -gdb-set verbose on to GDB.
 	//
-	// TODO: Think about what type of API you should use.
-	//
+	// TODO: Think about what type of API you should use for the method.
+	//       Remember that sending things to GDB is slow and should not block.
+
 	// TODO: You send commands to GDB with ICommandControlService.queueCommand()
-	//       You can use the existing command: MIGDBSet with the right parameters.
+	//       Use getServicesTracker().getService() to fetch the ICommandControl service.
+	
+	// TODO: Create a new MIGDBSet command with the necessary parameters for it to
+	//       be "-gdb-set verbose on" or "-gdb-set verbose off".
+	//       You should use ICommandControlService.getContext() as the first parameter;
+	//       this context represents GDB itself.
+	
+	// TODO: Call ICommandControlService.queueCommand() passing it:
+	//         1- the MIGDBSet command you created
+	//         2- a DataRequestMonitor as it expects
 }
