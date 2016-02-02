@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016 Ericsson
- *
+ * 
  * All rights reserved. This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License v1.0 which
  * accompanies this distribution, and is available at
@@ -85,4 +85,12 @@ public class FrameSpyService extends AbstractDsfService {
 			}
 		});
 	}
+	
+	// Global TODO: Write a new public method called setVerbose.
+	//              This method should send -gdb-set verbose on to GDB.
+	//
+	// TODO: Think about what type of API you should use.
+	//
+	// TODO: You send commands to GDB with ICommandControlService.queueCommand()
+	//       You can use the existing command: MIGDBSet with the right parameters.
 }
