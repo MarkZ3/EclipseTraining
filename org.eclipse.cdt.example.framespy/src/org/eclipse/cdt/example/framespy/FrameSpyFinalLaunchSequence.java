@@ -9,33 +9,52 @@
 
 package org.eclipse.cdt.example.framespy;
 
-public class FrameSpyFinalLaunchSequence {
-	// Global TODO: Extend DSF-GDB last FinalLaunchSequence (i.e. FinalLaunchSequence_7_7)
-	//              and add a step that will call FrameSpyService.setVerbose(true);
-	//              This new step should be the first step in the FinalLaunchSequence
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
-	// TODO: Have this class extend FinalLaunchSequence_7_7
-	//       and create appropriate constructor.
-	
-	// TODO: Create a new method called stepSetVerbose() by mimicking
-	//       the signature of FinalLaunchSequence_7_7#stepSetDPrinfStyle.
-	//       Don't forget the @Execute annotation
-	
-	// TODO: In stepSetVerbose(), get the FrameSpyService using a
-	//       DsfServicesTracker.
-	//       Call FrameSpyService#setVerbose to enable verbosity in GDB
-	
-	// TODO: When calling FrameSpyService#setVerbose, in the passed RequestMonitor
-	//       override handleComplete() instead of the usual handleSuccess();
-	//       in handleComplete() ignore any error and just call (parent)rm.done()
-	//       This is avoid preventing the debugger from starting if in the future
-	//       -gdb-set verbosity on would fail for any reason (removed by GDB for example)
-	
-	// TODO: Insert the new stepSetVerbose() step into the overall FinalLaunchSequence.
-	//       Override getExecutionOrder() in a similar way as is done in FinalLaunchSequence_7_7
-	//       Insert the new step early in the steps; you can probably make it the first step.
-	//       You can also follow the trail of FinalLaunchSequence classes to figure out what 
-	//       are the order of the steps, to make a more informed choice.
-	//       
+import org.eclipse.cdt.dsf.concurrent.RequestMonitor;
+import org.eclipse.cdt.dsf.concurrent.RequestMonitorWithProgress;
+import org.eclipse.cdt.dsf.gdb.launching.FinalLaunchSequence_7_7;
+import org.eclipse.cdt.dsf.service.DsfServicesTracker;
+import org.eclipse.cdt.dsf.service.DsfSession;
+
+public class FrameSpyFinalLaunchSequence extends FinalLaunchSequence_7_7 {
+
+    public FrameSpyFinalLaunchSequence(DsfSession session, Map<String, Object> attributes, RequestMonitorWithProgress rm) {
+        super(session, attributes, rm);
+    }
+
+    @Override
+    protected String[] getExecutionOrder(String group) {
+        if (GROUP_TOP_LEVEL.equals(group)) {
+            // Initialize the list with the base class' steps
+            // We need to create a list that we can modify, which is why we create our own ArrayList.
+			List<String> orderList = new ArrayList<String>(Arrays.asList(super.getExecutionOrder(GROUP_TOP_LEVEL)));
+
+            // Add the step to enable verbose as early as possible. However, let's wait until
+			// we've fetched the gdb version to avoid other printouts before those.
+            orderList.add(orderList.indexOf("stepGDBVersion")+1, "stepSetVerbose"); //$NON-NLS-1
+            
+            return orderList.toArray(new String[orderList.size()]);
+        }
+
+        return null;
+    }
+    
+    @Execute
+    public void stepSetVerbose(final RequestMonitor rm) {
+        DsfServicesTracker tracker = new DsfServicesTracker(Activator.getBundleContext(), getSession().getId());
+        FrameSpyService service = tracker.getService(FrameSpyService.class);        
+        tracker.dispose();
+        service.setVerbose(true, new RequestMonitor(service.getExecutor(), rm) {
+            @Override
+            protected void handleCompleted() {
+                // Accept errors by overriding handleCompleted() instead of handleSuccess()
+                rm.done();
+            }
+        });
+    }
 }
 
