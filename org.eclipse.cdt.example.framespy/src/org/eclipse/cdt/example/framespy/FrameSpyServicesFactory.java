@@ -10,8 +10,11 @@
 package org.eclipse.cdt.example.framespy;
 
 import org.eclipse.cdt.dsf.debug.service.IStack;
+import org.eclipse.cdt.dsf.debug.service.command.ICommandControl;
 import org.eclipse.cdt.dsf.gdb.service.GdbDebugServicesFactory;
+import org.eclipse.cdt.dsf.gdb.service.command.CommandFactory_6_8;
 import org.eclipse.cdt.dsf.service.DsfSession;
+import org.eclipse.debug.core.ILaunchConfiguration;
 
 public class FrameSpyServicesFactory extends GdbDebugServicesFactory {
 	public FrameSpyServicesFactory(String version) {
@@ -21,5 +24,10 @@ public class FrameSpyServicesFactory extends GdbDebugServicesFactory {
 	@Override
 	protected IStack createStackService(DsfSession session) {
 		return new FrameSpyStackService(session);
+	}
+	
+	@Override
+	protected ICommandControl createCommandControl(DsfSession session, ILaunchConfiguration config) {
+		return new FrameSpyControlService(session, config, new CommandFactory_6_8());
 	}
 }
