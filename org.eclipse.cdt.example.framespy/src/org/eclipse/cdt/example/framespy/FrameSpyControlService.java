@@ -9,11 +9,22 @@
 
 package org.eclipse.cdt.example.framespy;
 
-public class FrameSpyControlService {
+import java.util.Map;
 
-	// Global TODO: Extend the latest ICommandControlService to instantiate the new
-	//              FrameSpyFinalLaunchSequence (hint: look at how FinalLaunchSequence_7_7 is instantiated).
-	//
-	//              Finally, instantiate the new FrameSpyControlService as we did for our other
-	//              overridden service.
+import org.eclipse.cdt.dsf.concurrent.RequestMonitorWithProgress;
+import org.eclipse.cdt.dsf.concurrent.Sequence;
+import org.eclipse.cdt.dsf.gdb.service.extensions.GDBControl_HEAD;
+import org.eclipse.cdt.dsf.mi.service.command.CommandFactory;
+import org.eclipse.cdt.dsf.service.DsfSession;
+import org.eclipse.debug.core.ILaunchConfiguration;
+
+public class FrameSpyControlService extends GDBControl_HEAD {
+    public FrameSpyControlService(DsfSession session, ILaunchConfiguration config, CommandFactory factory) {
+    	super(session, config, factory);
+    }
+
+    @Override
+	protected Sequence getCompleteInitializationSequence(Map<String, Object> attributes, RequestMonitorWithProgress rm) {
+		return new FrameSpyFinalLaunchSequence(getSession(), attributes, rm);
+	}
 }
