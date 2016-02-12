@@ -6,6 +6,7 @@ import org.eclipse.cdt.core.dom.ast.IASTDeclarator;
 import org.eclipse.cdt.core.dom.ast.IASTNode;
 import org.eclipse.cdt.core.dom.ast.IASTTranslationUnit;
 import org.eclipse.cdt.core.dom.ast.IBinding;
+import org.eclipse.cdt.core.dom.ast.IType;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPClassType;
 import org.eclipse.cdt.core.dom.ast.cpp.ICPPMethod;
 import org.eclipse.cdt.core.parser.util.ArrayUtil;
@@ -32,7 +33,11 @@ public class ReturnTypeChecker extends AbstractIndexAstChecker {
 			ICPPMethod[] baseMethods = getAllBaseMethods(methodChecked.getClassOwner());
 			for (ICPPMethod baseMethod : baseMethods) {
 				if (baseMethod.isVirtual() && methodChecked.getName().equals(baseMethod.getName())) {
-					// Check that the return type is the same
+					IType returnType = baseMethod.getType().getReturnType();
+					if (!methodChecked.getType().getReturnType().isSameType(returnType)) {
+						//TODO: report problem
+						return;
+					}
 				}
 			}
 		}
