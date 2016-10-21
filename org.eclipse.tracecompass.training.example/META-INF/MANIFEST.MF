@@ -4,8 +4,8 @@ Bundle-Name: %Bundle-Name
 Bundle-Vendor: %Bundle-Vendor
 Bundle-Version: 1.0.0.qualifier
 Bundle-Localization: plugin
-Bundle-SymbolicName: org.eclipse.tracecompass.example;singleton:=true
-Bundle-Activator: org.eclipse.tracecompass.example.Activator
+Bundle-SymbolicName: org.eclipse.tracecompass.training.example;singleton:=true
+Bundle-Activator: org.eclipse.tracecompass.training.example.Activator
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Require-Bundle: org.eclipse.core.runtime,
@@ -16,5 +16,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.tracecompass.tmf.ctf.core,
  org.eclipse.tracecompass.tmf.ui,
  org.eclipse.ui
-Export-Package: org.eclipse.tracecompass.example
+Export-Package: org.eclipse.tracecompass.training.example
 
