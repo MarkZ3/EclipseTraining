@@ -18,5 +18,21 @@
                class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
          </tracetype>
       </module>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.training.example.processing.states">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.training.example.ProcessingTimeAnalysis">
+         </analysisModuleClass>
+      </output>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="org.eclipse.tracecompass.training.example.ProcessingStatesView"
+            id="org.eclipse.tracecompass.training.example.processing.states"
+            name="Processing States"
+            restorable="true">
+      </view>
    </extension>
 </plugin>
