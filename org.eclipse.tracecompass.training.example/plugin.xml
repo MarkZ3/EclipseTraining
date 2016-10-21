@@ -7,5 +7,16 @@
             class="org.eclipse.tracecompass.training.example.Activator">
       </startup>
    </extension>
-
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.training.example.ProcessingTimeAnalysis"
+            automatic="true"
+            id="org.eclipse.tracecompass.training.example.processing.module"
+            name="Processing Analysis">
+         <tracetype
+               class="org.eclipse.tracecompass.lttng2.ust.core.trace.LttngUstTrace">
+         </tracetype>
+      </module>
+   </extension>
 </plugin>
