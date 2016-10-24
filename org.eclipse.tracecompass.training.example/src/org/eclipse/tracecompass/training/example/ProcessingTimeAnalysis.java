@@ -21,14 +21,6 @@ import com.google.common.collect.ImmutableSet;
 
 public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
 
-    public static final String CREATE_EVENT = "ust_master:CREATE"; //$NON-NLS-1$
-    public static final String START_EVENT = "ust_master:START"; //$NON-NLS-1$
-    public static final String STOP_EVENT = "ust_master:STOP"; //$NON-NLS-1$
-    public static final String END_EVENT = "ust_master:END"; //$NON-NLS-1$
-    public static final String PROCESS_INIT_EVENT = "ust_master:PROCESS_INIT"; //$NON-NLS-1$
-    public static final String PROCESS_START_EVENT = "ust_master:PROCESS_START"; //$NON-NLS-1$
-    public static final String PROCESS_END_EVENT = "ust_master:PROCESS_END"; //$NON-NLS-1$
-
     /** The analysis's requirements. Only set after the trace is set. */
     private Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
 
@@ -51,13 +43,13 @@ public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
         Set<TmfAbstractAnalysisRequirement> requirements = fAnalysisRequirements;
         if (requirements == null) {
             Set<String> requiredEvents = ImmutableSet.of(
-                    CREATE_EVENT,
-                    START_EVENT,
-                    STOP_EVENT,
-                    END_EVENT,
-                    PROCESS_INIT_EVENT,
-                    PROCESS_START_EVENT,
-                    PROCESS_END_EVENT
+                    IEventConstants.CREATE_EVENT,
+                    IEventConstants.START_EVENT,
+                    IEventConstants.STOP_EVENT,
+                    IEventConstants.END_EVENT,
+                    IEventConstants.PROCESS_INIT_EVENT,
+                    IEventConstants.PROCESS_START_EVENT,
+                    IEventConstants.PROCESS_END_EVENT
                     );
             /* Initialize the requirements for the analysis: events */
             TmfAbstractAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
