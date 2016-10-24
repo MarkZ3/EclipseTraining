@@ -10,28 +10,22 @@ package org.eclipse.tracecompass.training.example;
 
 import java.util.Set;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
-import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
+import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
+import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 
 import com.google.common.collect.ImmutableSet;
 
-public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
+public class ProcessingTimeAnalysis extends TmfStateSystemAnalysisModule {
 
     /** The analysis's requirements. Only set after the trace is set. */
     private Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
 
 
     public ProcessingTimeAnalysis() {
-    }
-
-    @Override
-    protected boolean executeAnalysis(IProgressMonitor monitor) throws TmfAnalysisException {
-        System.out.println("Executing ProcessingTimeAnalysis...");
-        return true;
     }
 
     @Override
@@ -59,4 +53,12 @@ public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
         return requirements;
     }
 
+    @Override
+    protected ITmfStateProvider createStateProvider() {
+        ITmfTrace trace = getTrace();
+        if (trace == null) {
+            throw new IllegalStateException();
+        }
+        return new ProcessingTimeStateProvider(trace);
+    }
 }

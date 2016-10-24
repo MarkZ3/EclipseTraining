@@ -17,4 +17,10 @@ public interface IEventConstants {
     String PROCESS_INIT_EVENT = "ust_master:PROCESS_INIT";
     String PROCESS_START_EVENT = "ust_master:PROCESS_START";
     String PROCESS_END_EVENT = "ust_master:PROCESS_END";
+
+    enum ProcessingStates {
+        INITIALIZING,
+        PROCESSING,
+        WAITING;
+    }
 }
