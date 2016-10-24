@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>org.eclipse.tracecompass.training.example.target</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+	</buildSpec>
+	<natures>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>parent-pom.xml</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PARENT_LOC/pom.xml</locationURI>
+		</link>
+	</linkedResources>
+</projectDescription>
