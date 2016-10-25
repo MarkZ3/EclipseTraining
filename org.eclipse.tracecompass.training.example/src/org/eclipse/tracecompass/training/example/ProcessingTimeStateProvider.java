@@ -24,7 +24,7 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public int getVersion() {
-        return 4;
+        return 5;
     }
 
     @Override
@@ -78,17 +78,20 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
         }
 
         case IEventConstants.PROCESS_INIT_EVENT: {
-            // TODO change state of attribute Requester/<requester>/<id> to INITIALIZING
+            ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.INITIALIZING.ordinal());
+            updateProcessingState(stateSystem, event, stateValue);
             return;
         }
 
         case IEventConstants.PROCESS_START_EVENT: {
-            // TODO change state of attribute Requester/<requester>/<id> to PROCESSING
+            ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.PROCESSING.ordinal());
+            updateProcessingState(stateSystem, event, stateValue);
             return;
         }
 
         case IEventConstants.PROCESS_END_EVENT: {
-            // TODO change state of attribute Requester/<requester>/<id> to null state
+            ITmfStateValue stateValue = TmfStateValue.nullValue();
+            updateProcessingState(stateSystem, event, stateValue);
             return;
         }
 
@@ -106,6 +109,29 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
         // get quark of attribute for path Requester/requester
         int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
+
+        // get time of event
+        long t = event.getTimestamp().getValue();
+
+        // apply state change
+        stateSystem.modifyAttribute(t, stateValue, quark);
+        return;
+    }
+
+    private static void updateProcessingState(ITmfStateSystemBuilder stateSystem, ITmfEvent event, ITmfStateValue stateValue) {
+        // get event field with name
+        String requester = event.getContent().getFieldValue(String.class, "requester");
+        if (requester == null) {
+            return;
+        }
+
+        Long id = event.getContent().getFieldValue(Long.class, "id");
+        if (id == null) {
+            return;
+        }
+
+        // get quark of attribute for path Requester/requester
+        int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester, String.valueOf(id));
 
         // get time of event
         long t = event.getTimestamp().getValue();
