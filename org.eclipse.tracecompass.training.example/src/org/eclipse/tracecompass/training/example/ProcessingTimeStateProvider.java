@@ -24,7 +24,7 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public int getVersion() {
-        return 2;
+        return 3;
     }
 
     @Override
@@ -90,9 +90,24 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
             return;
         }
 
-        case IEventConstants.STOP_EVENT:
-            // TODO update state of attribute Requester/requesterString to WAITING
+        case IEventConstants.STOP_EVENT: {
+            // get event field with name
+            String requester = event.getContent().getFieldValue(String.class, "requester");
+            if (requester == null) {
+                return;
+            }
+
+            // get quark of attribute for path Requester/requesterString
+            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
+            ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.WAITING.ordinal());
+
+            // get time of event
+            long t = event.getTimestamp().getValue();
+
+            // apply state change
+            stateSystem.modifyAttribute(t, stateValue, quark);
             return;
+        }
 
         case IEventConstants.END_EVENT:
             // TODO update state of attribute Requester/requesterString to null state
