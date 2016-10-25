@@ -9,6 +9,8 @@
 package org.eclipse.tracecompass.training.example;
 
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystemBuilder;
+import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
+import org.eclipse.tracecompass.statesystem.core.statevalue.TmfStateValue;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.statesystem.AbstractTmfStateProvider;
 import org.eclipse.tracecompass.tmf.core.statesystem.ITmfStateProvider;
@@ -22,7 +24,7 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public int getVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -51,7 +53,21 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
          */
         switch (event.getName()) {
         case IEventConstants.CREATE_EVENT:
-            // TODO update state of attribute Requester/requesterString to INITIALIZING
+            // get event field with name
+            String requester = event.getContent().getFieldValue(String.class, "requester");
+            if (requester == null) {
+                return;
+            }
+
+            // get quark of attribute for path Requester/requesterString
+            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
+            ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.INITIALIZING.ordinal());
+
+            // get time of event
+            long t = event.getTimestamp().getValue();
+
+            // apply state change
+            stateSystem.modifyAttribute(t, stateValue, quark);
             return;
 
         case IEventConstants.START_EVENT:
