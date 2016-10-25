@@ -53,78 +53,26 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
          */
         switch (event.getName()) {
         case IEventConstants.CREATE_EVENT: {
-            // get event field with name
-            String requester = event.getContent().getFieldValue(String.class, "requester");
-            if (requester == null) {
-                return;
-            }
-
-            // get quark of attribute for path Requester/requesterString
-            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
             ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.INITIALIZING.ordinal());
-
-            // get time of event
-            long t = event.getTimestamp().getValue();
-
-            // apply state change
-            stateSystem.modifyAttribute(t, stateValue, quark);
+            updateRequesterState(stateSystem, event, stateValue);
             return;
         }
 
         case IEventConstants.START_EVENT: {
-            // get event field with name
-            String requester = event.getContent().getFieldValue(String.class, "requester");
-            if (requester == null) {
-                return;
-            }
-
-            // get quark of attribute for path Requester/requesterString
-            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
             ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.PROCESSING.ordinal());
-
-            // get time of event
-            long t = event.getTimestamp().getValue();
-
-            // apply state change
-            stateSystem.modifyAttribute(t, stateValue, quark);
+            updateRequesterState(stateSystem, event, stateValue);
             return;
         }
 
         case IEventConstants.STOP_EVENT: {
-            // get event field with name
-            String requester = event.getContent().getFieldValue(String.class, "requester");
-            if (requester == null) {
-                return;
-            }
-
-            // get quark of attribute for path Requester/requesterString
-            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
             ITmfStateValue stateValue = TmfStateValue.newValueInt(IEventConstants.ProcessingStates.WAITING.ordinal());
-
-            // get time of event
-            long t = event.getTimestamp().getValue();
-
-            // apply state change
-            stateSystem.modifyAttribute(t, stateValue, quark);
+            updateRequesterState(stateSystem, event, stateValue);
             return;
         }
 
         case IEventConstants.END_EVENT: {
-            // get event field with name
-            String requester = event.getContent().getFieldValue(String.class, "requester");
-            if (requester == null) {
-                return;
-            }
-
-            // get quark of attribute for path Requester/requesterString
-            int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
             ITmfStateValue stateValue = TmfStateValue.nullValue();
-
-            // get time of event
-            long t = event.getTimestamp().getValue();
-
-            // apply state change
-            stateSystem.modifyAttribute(t, stateValue, quark);
+            updateRequesterState(stateSystem, event, stateValue);
             return;
         }
 
@@ -133,4 +81,21 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
         }
     }
 
+    private static void updateRequesterState(ITmfStateSystemBuilder stateSystem, ITmfEvent event, ITmfStateValue stateValue) {
+        // get event field with name
+        String requester = event.getContent().getFieldValue(String.class, "requester");
+        if (requester == null) {
+            return;
+        }
+
+        // get quark of attribute for path Requester/requester
+        int quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester);
+
+        // get time of event
+        long t = event.getTimestamp().getValue();
+
+        // apply state change
+        stateSystem.modifyAttribute(t, stateValue, quark);
+        return;
+    }
 }
