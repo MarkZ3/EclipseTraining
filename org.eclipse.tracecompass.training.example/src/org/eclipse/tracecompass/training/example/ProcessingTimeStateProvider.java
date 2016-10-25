@@ -24,7 +24,7 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
     @Override
     public int getVersion() {
-        return 5;
+        return 6;
     }
 
     @Override
@@ -38,7 +38,6 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
         if (stateSystem == null){
             return;
         }
-
         /**
          * Attribute tree:
          * --------------
@@ -144,7 +143,15 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
         // apply state change
         stateSystem.modifyAttribute(t, stateValue, quark);
 
-        // TODO add optional attribute to store the number (using optional event field "value")
+        // Add optional attribute to store the number (using optional event field "value")
+        Long number = event.getContent().getFieldValue(Long.class, "value");
+        if (number == null) {
+            return;
+        }
+        quark = stateSystem.getQuarkAbsoluteAndAdd("Requester", requester, String.valueOf(id), "number");
+        ITmfStateValue newTidValue = TmfStateValue.newValueLong(number);
+        stateSystem.modifyAttribute(t, newTidValue, quark);
+
         return;
     }
 }
