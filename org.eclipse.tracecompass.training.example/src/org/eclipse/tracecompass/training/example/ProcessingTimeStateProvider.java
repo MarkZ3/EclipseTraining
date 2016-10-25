@@ -46,10 +46,15 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
          *     |
          *     |-<requester> -> State Value
          *            |---<id> -> State Value
+         *                 |---number -> Number Value
          *
          * State Value:
          * -----------
          * Use enum Processing state in {@link IEventConstants}
+         *
+         * Number Value:
+         * ------------
+         * Store optional event field "value"
          *
          */
         switch (event.getName()) {
@@ -138,6 +143,8 @@ public class ProcessingTimeStateProvider extends AbstractTmfStateProvider {
 
         // apply state change
         stateSystem.modifyAttribute(t, stateValue, quark);
+
+        // TODO add optional attribute to store the number (using optional event field "value")
         return;
     }
 }
