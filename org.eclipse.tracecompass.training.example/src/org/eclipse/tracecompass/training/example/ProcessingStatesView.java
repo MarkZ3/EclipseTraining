@@ -37,12 +37,10 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
     private static String[] FILTER_COLUMNS = { "Entry" };
 
     public ProcessingStatesView() {
-        // TODO call super with view ID and presentation provider
-        // super(ID, new ProcessingStatesPresentationProvider());
-
-        // TODO enable entry filtering
-//        setFilterColumns(FILTER_COLUMNS);
-//        setFilterLabelProvider(new FilterLabelProvider());
+        super(ID, new ProcessingStatesPresentationProvider());
+        // Enable entry filtering
+        setFilterColumns(FILTER_COLUMNS);
+        setFilterLabelProvider(new FilterLabelProvider());
     }
 
     @Override
@@ -62,25 +60,33 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
             return;
         }
 
-        // TODO Set the start and end time in the view
+        // set the start and end time of the in the view
         long start = ssq.getStartTime();
         long end = ssq.getCurrentEndTime() + 1;
         setStartTime(Math.min(getStartTime(), start));
         setEndTime(Math.max(getEndTime(), end));
 
-        // TODO: Create a root entry for the trace
-//        final TraceEntry traceEntry = new TraceEntry(trace.getName(), start, end);
+        // Create a root entry for the trace
+        final TraceEntry traceEntry = new TraceEntry(trace.getName(), start, end);
 
-        // TODO Register root entry to view
-//        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
+        // Register root entry to view
+        addToEntryList(parentTrace, Collections.singletonList(traceEntry));
 
-        /*
-         * TODO:
-         * - Create time graph entry list for attributes "Requester"/"*"/"*"
-         * - Hint: Base your implementation of fillTimeGraph() in previous (see comment-out method below)
-         * - Call method private method buildStatusEvent() for each RequesterEntry to fill time events
-         */
+        // Register root entry to view
+        List<Integer> requesterQuarks = ssq.getQuarks("Requester", "*");
+        for (Integer requesterQuark : requesterQuarks) {
+            String requesterName = ssq.getAttributeName(requesterQuark);
+            RequesterEntry reqEntry = new RequesterEntry(requesterName, start, end, ssq, requesterQuark);
+            traceEntry.addChild(reqEntry);
 
+            List<Integer> idQuarks = ssq.getQuarks(requesterQuark, "*");
+            for (Integer idQuark : idQuarks) {
+                String idName = ssq.getAttributeName(idQuark);
+                RequesterEntry idEntry = new RequesterEntry(idName, start, end, ssq, idQuark);
+                reqEntry.addChild(idEntry);
+            }
+            buildStatusEvent(reqEntry, monitor, start, end);
+        }
         if (parentTrace.equals(getTrace())) {
             refresh();
         }
@@ -91,14 +97,30 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
         if (!(entry instanceof RequesterEntry)) {
             return Collections.EMPTY_LIST;
         }
+        RequesterEntry requesterEntry = (RequesterEntry) entry;
+        ITmfStateSystem ssq = requesterEntry.getStateSystem();
         List<ITimeEvent> eventList = null;
-        /*
-         *  TODO:
-         *  - create event list for TimeGraphEntry entry
-         *  - query history range between start and end time (use method getResolution for the display resolution)
-         *  - Hint: Base your implementation of getEventList() in previous exercise (see comment-out method below)
-         *  - return event list
-         */
+        int quark = requesterEntry.getQuark();
+
+        try {
+            if (requesterEntry.getQuark() != -1) {
+                List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, startTime, endTime - 1, resolution, monitor);
+                eventList = new ArrayList<>(statusIntervals.size());
+                for (ITmfStateInterval statusInterval : statusIntervals) {
+                    if (monitor.isCanceled()) {
+                        return null;
+                    }
+                    int status = getStatusFromInterval(statusInterval);
+                    long time = statusInterval.getStartTime();
+                    long duration = statusInterval.getEndTime() - time + 1;
+                    if (!statusInterval.getStateValue().isNull()) {
+                        eventList.add(new TimeEvent(entry, time, duration, status));
+                    }
+                }
+            }
+        } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException | StateSystemDisposedException e) {
+            /* Ignored */
+        }
         return eventList;
     }
 
@@ -123,10 +145,6 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
             RequesterEntry xmlEntry = (RequesterEntry) entry;
             buildStatusEvent(xmlEntry, monitor, start, end);
         }
-    }
-
-    private long getResolution(long start, long end) {
-        return Math.max(1, (end - start) / getDisplayWidth());
     }
 
     private static class TraceEntry extends TimeGraphEntry {
@@ -173,6 +191,10 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
 
     }
 
+    private long getResolution(long start, long end) {
+        return Math.max(1, (end - start) / getDisplayWidth());
+    }
+
     private static int getStatusFromInterval(ITmfStateInterval statusInterval) {
         ITmfStateValue stateValue = statusInterval.getStateValue();
         int status = -1;
@@ -194,87 +216,4 @@ public class ProcessingStatesView extends AbstractTimeGraphView {
         }
         return status;
     }
-
-//  private void fillTimeGraph() {
-//  ITmfTrace trace = fTrace;
-//  if (trace == null) {
-//      return;
-//  }
-//
-//  // get relevant state system
-//  final ITmfStateSystem ssq = TmfStateSystemAnalysisModule.getStateSystem(trace, ProcessingTimeAnalysis.ID);
-//  if (ssq == null) {
-//      return;
-//  }
-//
-//  // make sure that it is fully build
-//  ssq.waitUntilBuilt();
-//
-//  // set the start and end time of the in the view
-//  long start = ssq.getStartTime();
-//  long end = ssq.getCurrentEndTime() + 1;
-//
-//  // Create a root entry for the trace
-//  final TraceEntry traceEntry = new TraceEntry(trace.getName(), start, end);
-//  /*
-//   * Get the quarks of all children of attribute "Requester".
-//   */
-//  List<Integer> requesterQuarks = ssq.getQuarks("Requester", "*");
-//  for (Integer requesterQuark : requesterQuarks) {
-//       String requesterName = ssq.getAttributeName(requesterQuark);
-//       // Create RequesterEntry and add it as child to the trace entry
-//       RequesterEntry reqEntry = new RequesterEntry(requesterName, start, end, ssq, requesterQuark);
-//       traceEntry.addChild(reqEntry);
-//
-//       // Get all time events for this entry
-//       List<ITimeEvent> eventList = getEventList(reqEntry, start, end);
-//       reqEntry.setEventList(eventList);
-//
-//       List<Integer> idQuarks = ssq.getQuarks(requesterQuark, "*");
-//       for (Integer idQuark : idQuarks) {
-//           String idName = ssq.getAttributeName(idQuark);
-//           RequesterEntry idEntry = new RequesterEntry(idName, start, end, ssq, idQuark);
-//           reqEntry.addChild(idEntry);
-//
-//           // Get all time events for this entry
-//           eventList = getEventList(idEntry, start, end);
-//           idEntry.setEventList(eventList);
-//       }
-//  }
-//
-//  // Store entry list into TimeGraphViewer
-//  List<ITimeGraphEntry> entryList = new ArrayList<>();
-//  entryList.add(traceEntry);
-//  fTimeGraphViewer.setInput(entryList);
-//  fTimeGraphViewer.refresh();
-//}
-
-//private static List<ITimeEvent> getEventList(TimeGraphEntry entry, long startTime, long endTime) {
-//  if (!(entry instanceof RequesterEntry)) {
-//      return Collections.EMPTY_LIST;
-//  }
-//  RequesterEntry requesterEntry = (RequesterEntry) entry;
-//  ITmfStateSystem ssq = requesterEntry.getStateSystem();
-//  List<ITimeEvent> eventList = null;
-//  int quark = requesterEntry.getQuark();
-//
-//  try {
-//      if (requesterEntry.getQuark() != -1) {
-//          List<ITmfStateInterval> statusIntervals = StateSystemUtils.queryHistoryRange(ssq, quark, startTime, endTime - 1);
-//          eventList = new ArrayList<>(statusIntervals.size());
-//          for (ITmfStateInterval statusInterval : statusIntervals) {
-//              int status = getStatusFromInterval(statusInterval);
-//              long time = statusInterval.getStartTime();
-//              long duration = statusInterval.getEndTime() - time + 1;
-//              if (!statusInterval.getStateValue().isNull()) {
-//                  eventList.add(new TimeEvent(entry, time, duration, status));
-//              }
-//          }
-//      }
-//  } catch (AttributeNotFoundException | TimeRangeException | StateValueTypeException | StateSystemDisposedException e) {
-//      /* Ignored */
-//  }
-//  return eventList;
-//}
-
 }
