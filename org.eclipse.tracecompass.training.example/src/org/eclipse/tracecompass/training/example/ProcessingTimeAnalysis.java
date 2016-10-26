@@ -21,6 +21,9 @@ import com.google.common.collect.ImmutableSet;
 
 public class ProcessingTimeAnalysis extends TmfStateSystemAnalysisModule {
 
+    /** The analysi module ID (has to match the one in the plugin.xml) */
+    public static final String ID = "org.eclipse.tracecompass.training.example.processing.module";
+
     /** The analysis's requirements. Only set after the trace is set. */
     private Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
 
