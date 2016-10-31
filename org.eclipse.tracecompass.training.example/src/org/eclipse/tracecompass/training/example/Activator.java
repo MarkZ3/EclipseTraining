@@ -9,13 +9,14 @@
 
 package org.eclipse.tracecompass.training.example;
 
+import org.eclipse.ui.IStartup;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 /**
  * The activator class controls the plug-in life cycle
  */
-public class Activator extends AbstractUIPlugin {
+public class Activator extends AbstractUIPlugin implements IStartup {
 
     /** The plug-in ID */
     public static final String PLUGIN_ID = "org.eclipse.tracecompass.training.example"; //$NON-NLS-1$
@@ -35,6 +36,7 @@ public class Activator extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         bundleContext = context;
+        //TODO: instantiate new EventReader class
     }
 
     @Override
@@ -56,5 +58,9 @@ public class Activator extends AbstractUIPlugin {
      */
     public static BundleContext getBundleContext() {
         return bundleContext;
+    }
+
+    @Override
+    public void earlyStartup() {
     }
 }
