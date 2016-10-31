@@ -11,27 +11,22 @@ package org.eclipse.tracecompass.training.example;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.tracecompass.statesystem.core.ITmfStateSystem;
-import org.eclipse.tracecompass.statesystem.core.StateSystemUtils;
-import org.eclipse.tracecompass.statesystem.core.exceptions.AttributeNotFoundException;
-import org.eclipse.tracecompass.statesystem.core.exceptions.StateSystemDisposedException;
-import org.eclipse.tracecompass.statesystem.core.interval.ITmfStateInterval;
-import org.eclipse.tracecompass.statesystem.core.statevalue.ITmfStateValue;
-import org.eclipse.tracecompass.tmf.core.signal.TmfSelectionRangeUpdatedSignal;
 import org.eclipse.tracecompass.tmf.core.signal.TmfSignalHandler;
 import org.eclipse.tracecompass.tmf.core.signal.TmfTraceSelectedSignal;
 import org.eclipse.tracecompass.tmf.core.statesystem.TmfStateSystemAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.trace.ITmfTrace;
 import org.eclipse.tracecompass.tmf.core.trace.TmfTraceManager;
 import org.eclipse.tracecompass.tmf.ui.views.TmfView;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.TimeGraphViewer;
+import org.eclipse.tracecompass.tmf.ui.widgets.timegraph.model.TimeGraphEntry;
 
 public class ProcessingStatesView extends TmfView {
-    private Text fTextArea;
+
+    /** The time graph viewer */
+    private TimeGraphViewer fTimeGraphViewer;
 
     /** The selected trace */
     private ITmfTrace fTrace;
@@ -42,16 +37,9 @@ public class ProcessingStatesView extends TmfView {
 
     @Override
     public void createPartControl(Composite parent) {
-        // Create an inner composite
-        Composite viewComposite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout();
-        viewComposite.setLayout(layout);
-
-        // Create a text area
-        fTextArea = new Text(viewComposite, SWT.BORDER | SWT.MULTI  | SWT.WRAP | SWT.V_SCROLL);
-        GridData gridData = new GridData(GridData.FILL_BOTH);
-        fTextArea.setLayoutData(gridData);
-        fTextArea.setEditable(false);
+        // Create Time Graph Viewer
+//        fTimeGraphViewer = new TimeGraphViewer(parent, SWT.NONE);
+//        fTimeGraphViewer.setTimeGraphProvider(new ProcessingStatesPresentationProvider());
 
         // Select trace if it is already open when opening the view
         ITmfTrace trace = TmfTraceManager.getInstance().getActiveTrace();
@@ -62,7 +50,7 @@ public class ProcessingStatesView extends TmfView {
 
     @Override
     public void setFocus() {
-        fTextArea.setFocus();
+        fTimeGraphViewer.setFocus();
     }
 
     @TmfSignalHandler
@@ -71,29 +59,18 @@ public class ProcessingStatesView extends TmfView {
             return;
         }
         fTrace = signal.getTrace();
-    }
-
-    @TmfSignalHandler
-    public void selectionRangeUpdated(final TmfSelectionRangeUpdatedSignal signal) {
-        if (signal.getSource() == this || fTrace == null) {
-            return;
-        }
-
-        final long beginTime = signal.getBeginTime().toNanos();
-        final long endTime = signal.getEndTime().toNanos();
-
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
                 /*
                  * Signal might be sent from non-UI thread
                  */
-                printStates(beginTime, endTime);
+                fillTimeGraph();
             }
         });
     }
 
-    private void printStates(long startTime, long endTime) {
+    private void fillTimeGraph() {
         ITmfTrace trace = fTrace;
         if (trace == null) {
             return;
@@ -107,81 +84,84 @@ public class ProcessingStatesView extends TmfView {
 
         // make sure that it is fully build
         ssq.waitUntilBuilt();
-        outputText("startTime=" + startTime + ", endTime=" + endTime);
+
+        // set the start and end time of the in the view
+        long start = ssq.getStartTime();
+        long end = ssq.getCurrentEndTime() + 1;
 
         /*
-         * 1) get the quarks of all children of attribute "Requester".
-         *    Print the quark and attribute name to screen
+         * TODO:
+         * Create TraceEntry as root element
+         * Use existing TraceEntry class (see below)
+         */
+        // Create a root entry for the trace
+//        final TraceEntry traceEntry = new TraceEntry(trace.getName(), start, end);
+        /*
+         * Get the quarks of all children of attribute "Requester".
          */
         List<Integer> requesterQuarks = ssq.getQuarks("Requester", "*");
         for (Integer requesterQuark : requesterQuarks) {
-            String requesterName = ssq.getAttributeName(requesterQuark);
-            outputText("Exercise 1");
-            outputText("attribute=" + requesterName + ", quark=" + requesterQuark);
-            outputText("--------------------------------------");
-            try {
-                /*
-                 * 2) Get ITmfStateInterval of attribute Requester/<requester> at startTime (single query)
-                 *    Print value of ITmfStateValue
-                 *    Question: what data type is the state value?
-                 */
-                outputText("Exercise 2");
-                ITmfStateInterval interval = ssq.querySingleState(startTime, requesterQuark);
-                ITmfStateValue state = interval.getStateValue();
-                outputText("state at start=" + state.toString());
-                outputText("--------------------------------------");
-                /*
-                 *  3) Print ITmfStateValue of attribute Requester/<requester> at endTime
-                 */
-                outputText("Exercise 3");
-                interval = ssq.querySingleState(endTime, requesterQuark);
-                state = interval.getStateValue();
-                outputText("state at end=" + state.toString());
-                outputText("--------------------------------------");
-                /*
-                 * 4) Query history range using utility class StateSystemUtils and
-                 *     print each ITmfStateInterval (state value, start time, end time and duration)
-                 */
-                outputText("Exercise 4");
-                List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ssq, requesterQuark, startTime, endTime);
-                for (ITmfStateInterval inter : intervals) {
-                    outputText("interval" + inter.toString());
-                }
-                outputText("--------------------------------------");
-                /*
-                 * 5) Do a full query at end time and print each attribute, path and state interval
-                 */
-                outputText("Exercise 5");
 
-                intervals = ssq.queryFullState(endTime);
-                for (ITmfStateInterval inter : intervals) {
-                    outputText("interval" + inter.toString() +
-                            ", \tattributeName=" + ssq.getAttributeName(inter.getAttribute()) +
-                            ", \tattributePath=" + ssq.getFullAttributePath(inter.getAttribute()));
-
-                }
-                outputText("--------------------------------------");
+//            try {
                 /*
-                 * 6) Bonus: do step 4 with all attribute with path Requester/<requester>/<id>
+                 * TODO:
+                 * - Create RequesterEntry and add it as child to the trace entry
+                 * - Use existing RequesterEntry class (see below)
                  */
-                outputText("Exercise 6");
-                List<Integer> idQuarks = ssq.getQuarks(requesterQuark, "*");
-                for (Integer idQuark : idQuarks) {
-                    intervals = StateSystemUtils.queryHistoryRange(ssq, idQuark, startTime, endTime);
-                    for (ITmfStateInterval inter : intervals) {
-                        outputText("interval" + inter.toString());
-                    }
-                }
+            // String requesterName = ssq.getAttributeName(requesterQuark);
+            // RequesterEntry reqEntry = new RequesterEntry(requesterName, start, end, ssq, requesterQuark);
 
-            } catch (StateSystemDisposedException | AttributeNotFoundException e) {
-                e.printStackTrace();
-            }
+                /*
+                 * TODO:
+                 * - Query history range for each requesterQuark between startTime and endTime,
+                 * - create a TimeEvent for each ITmfStateInterval
+                 * - Add list of time events to the requester quark
+                 */
+//                List<ITmfStateInterval> intervals = StateSystemUtils.queryHistoryRange(ssq, requesterQuark, startTime, endTime);
+//                for (ITmfStateInterval inter : intervals) {
+//                }
+//            } catch (StateSystemDisposedException | AttributeNotFoundException e) {
+//                e.printStackTrace();
+//            }
+        }
+        /*
+         * TODO Set model into viewer.
+         */
+//        List<ITimeGraphEntry> entryList = new ArrayList<>();
+//        entryList.add(traceEntry);
+//        fTimeGraphViewer.setInput(entryList);
+
+    }
+
+    private static class TraceEntry extends TimeGraphEntry {
+        public TraceEntry(String name, long startTime, long endTime) {
+            super(name, startTime, endTime);
         }
 
-        outputText("=========================================");
+        @Override
+        public boolean hasTimeEvents() {
+            return false;
+        }
     }
-    private void outputText(String text) {
-        fTextArea.append(text);
-        fTextArea.append(System.getProperty("line.separator"));
+
+    public static class RequesterEntry extends TimeGraphEntry {
+        private int fQuark;
+        ITmfStateSystem fSsq;
+        public RequesterEntry(String name, long startTime, long endTime, ITmfStateSystem ssq, int quark) {
+            super(name, startTime, endTime);
+            fSsq = ssq;
+            fQuark = quark;
+        }
+        public RequesterEntry(String name, long startTime, long endTime, ITmfStateSystem ssq) {
+            this(name, startTime, endTime, ssq, -1);
+        }
+
+        public int getQuark() {
+            return fQuark;
+        }
+
+        public ITmfStateSystem getStateSystem() {
+            return fSsq;
+        }
     }
 }
