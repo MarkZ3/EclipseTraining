@@ -8,13 +8,16 @@
  *******************************************************************************/
 package org.eclipse.tracecompass.training.example;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAbstractAnalysisRequirement.PriorityLevel;
+import org.eclipse.tracecompass.tmf.core.analysis.requirements.TmfAnalysisEventRequirement;
 import org.eclipse.tracecompass.tmf.core.exceptions.TmfAnalysisException;
+
+import com.google.common.collect.ImmutableSet;
 
 public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
 
@@ -25,6 +28,10 @@ public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
     public static final String PROCESS_INIT_EVENT = "ust_master:PROCESS_INIT"; //$NON-NLS-1$
     public static final String PROCESS_START_EVENT = "ust_master:PROCESS_START"; //$NON-NLS-1$
     public static final String PROCESS_END_EVENT = "ust_master:PROCESS_END"; //$NON-NLS-1$
+
+    /** The analysis's requirements. Only set after the trace is set. */
+    private Set<TmfAbstractAnalysisRequirement> fAnalysisRequirements;
+
 
     public ProcessingTimeAnalysis() {
     }
@@ -41,22 +48,23 @@ public class ProcessingTimeAnalysis extends TmfAbstractAnalysisModule {
 
     @Override
     public Iterable<TmfAbstractAnalysisRequirement> getAnalysisRequirements() {
-        Set<TmfAbstractAnalysisRequirement> requirements = new HashSet<>();
-        /*
-         * TODO:
-         * - Create a Collection with event names
-         * - Use constants above
-         */
-
-        /* TODO:
-         * - Create a TmfAnalysiEventRequirement instance
-         */
-
-        /*
-         * TODO:
-         * - Add requirements to the requirements set
-         */
-        // Return the set (which is an iterable)
+        Set<TmfAbstractAnalysisRequirement> requirements = fAnalysisRequirements;
+        if (requirements == null) {
+            Set<String> requiredEvents = ImmutableSet.of(
+                    CREATE_EVENT,
+                    START_EVENT,
+                    STOP_EVENT,
+                    END_EVENT,
+                    PROCESS_INIT_EVENT,
+                    PROCESS_START_EVENT,
+                    PROCESS_END_EVENT
+                    );
+            /* Initialize the requirements for the analysis: events */
+            TmfAbstractAnalysisRequirement eventsReq = new TmfAnalysisEventRequirement(requiredEvents, PriorityLevel.MANDATORY);
+            requirements = ImmutableSet.of(eventsReq);
+            fAnalysisRequirements = requirements;
+        }
         return requirements;
     }
+
 }
