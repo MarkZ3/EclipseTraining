@@ -12,6 +12,8 @@ public class EventReader {
 
     @TmfSignalHandler
     public void traceOpened(TmfTraceOpenedSignal signal) {
-        System.out.println("trace opened: " + signal.getTrace().getName());
+        // TODO: Create a TmfEventRequest here.
+        // Output each event to the console.
+        // Output something when request is completed.
     }
 }
