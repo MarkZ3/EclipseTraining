@@ -36,7 +36,7 @@ public class Activator extends AbstractUIPlugin implements IStartup {
         super.start(context);
         plugin = this;
         bundleContext = context;
-        //TODO: instantiate new EventReader class
+        new EventReader();
     }
 
     @Override
