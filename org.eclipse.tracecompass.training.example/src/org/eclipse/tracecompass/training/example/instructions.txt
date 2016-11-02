@@ -1,0 +1,30 @@
+TODOs:
+- Open MANIFEST.MF file
+- Select extension tab
+- click on Add
+	- New Extension wizard opens
+	- find analysis extension point: org.eclipse.linuxtools.tmf.core.analysis
+	- click on Finish
+- In tree select "org.eclipse.linuxtools.tmf.core.analysis" with left mouse button
+- Click right mouse button -> New -> module
+- Update id: "org.eclipse.tracecompass.training.example.processing.module"
+- Update name: Processing Module
+- automatic true
+- keep defaults for others (e.g. applies_experiment)
+- click on hyperlink "analysis_module" 
+	- New Class wizard opens
+	- Update package: org.eclipse.tracecompass.training.example
+	- Update name: ProcessingModule
+	- Superclass click on "Browse..."
+		- Find Superclass: TmfAbstractAnalysisModule
+		- Click on OK
+ 	- Remove Interface org.eclipse.tracecompass.tmf.core.analysis.IAnalysisModule
+
+- Select Processing Module
+- Right mouse click on "Process Module" -> New -> tracetype
+	- Select Browse
+	- Select Type Dialog opens:
+		- find "LttngUstTrace" org.eclipse.tracecompass.lttng2.ust.core.trace
+
+- Open Process Module class
+	- Add print out to executeAnalysis and return null
