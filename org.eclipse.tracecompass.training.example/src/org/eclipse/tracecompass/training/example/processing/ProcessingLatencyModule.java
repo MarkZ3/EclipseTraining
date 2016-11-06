@@ -22,6 +22,7 @@ import org.eclipse.tracecompass.segmentstore.core.ISegmentStore;
 import org.eclipse.tracecompass.tmf.core.event.ITmfEvent;
 import org.eclipse.tracecompass.tmf.core.segment.ISegmentAspect;
 import org.eclipse.tracecompass.tmf.core.util.Pair;
+import org.eclipse.tracecompass.training.example.IEventConstants;
 
 /**
  * A module that builds segments representing the beginning and end of processing.
@@ -34,7 +35,8 @@ public class ProcessingLatencyModule extends AbstractSegmentStoreAnalysisEventBa
 
     private static final Collection<ISegmentAspect> PROCESSING_ASPECTS = new ArrayList<>();
     static {
-        // TODO: Add Name aspect and Content aspect to PROCESSING_ASPECTS
+        PROCESSING_ASPECTS.add(ProcessingNameAspect.INSTANCE);
+        PROCESSING_ASPECTS.add(ProcessingContentAspect.INSTANCE);
     }
     private final Map<ProcessingInfoKey, ProcessingInitialInfo> fOngoingProcessingSegments = new HashMap<>();
 
@@ -54,16 +56,26 @@ public class ProcessingLatencyModule extends AbstractSegmentStoreAnalysisEventBa
 
     @Override
     protected AbstractSegmentStoreAnalysisRequest createAnalysisRequest(ISegmentStore<ISegment> segmentStore) {
-        // TODO: - Create a new AbstractSegmentStoreAnalysisRequest and return it (instead of null)
-        //          - Override handleData
-        //              - Call processEvent
-        return null;
+        return new AbstractSegmentStoreAnalysisRequest(segmentStore) {
+            @Override
+            public void handleData(ITmfEvent event) {
+                super.handleData(event);
+                processEvent(event, segmentStore);
+            }
+        };
     }
 
     private void processEvent(ITmfEvent event, ISegmentStore<ISegment> segmentStore) {
-        // TODO: - If the event name is equal to constant IEventConstants.PROCESS_START_EVENT, add it do the ongoing segments (fOngoingProcessingSegments)
-        //       - otherwise, if the name is IEventConstants.PROCESS_END_EVENT, check if there is a corresponding ProcessingInitialInfo in ongoing segments (fOngoingProcessingSegments)
-        //          - Add the segment
+        if (event.getName().equals(IEventConstants.PROCESS_START_EVENT)) {
+            fOngoingProcessingSegments.put(new ProcessingInfoKey(event), new ProcessingInitialInfo(event));
+        } else if (event.getName().equals(IEventConstants.PROCESS_END_EVENT)) {
+            ProcessingInfoKey key = new ProcessingInfoKey(event);
+            ProcessingInitialInfo processingInfo = fOngoingProcessingSegments.get(key);
+            if (processingInfo != null) {
+                long endTime = event.getTimestamp().getValue();
+                segmentStore.add(new ProcessingSegment(processingInfo.fStart, endTime, "PROCESSING", key.getSecond(), key.getFirst()));
+            }
+        }
     }
 
     @Override
