@@ -32,6 +32,13 @@
                class="org.eclipse.tracecompass.training.example.processing.ProcessingLatencyModule">
          </analysisModuleClass>
       </output>
+      <output
+            class="org.eclipse.tracecompass.tmf.ui.analysis.TmfAnalysisViewOutput"
+            id="org.eclipse.tracecompass.training.processing.statistics">
+         <analysisModuleClass
+               class="org.eclipse.tracecompass.training.example.processing.ProcessingLatencyModule">
+         </analysisModuleClass>
+      </output>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -60,6 +67,12 @@
             class="org.eclipse.tracecompass.training.example.processing.views.ProcessingLatencyTableView"
             id="org.eclipse.tracecompass.training.processing.table"
             name="Latency Table"
+            restorable="true">
+      </view>
+      <view
+            class="org.eclipse.tracecompass.training.example.processing.views.ProcessingLatencyStatisticsView"
+            id="org.eclipse.tracecompass.training.processing.statistics"
+            name="Latency Statistics"
             restorable="true">
       </view>
    </extension>
