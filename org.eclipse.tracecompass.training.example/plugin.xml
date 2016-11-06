@@ -35,4 +35,16 @@
             restorable="true">
       </view>
    </extension>
+   <extension
+         point="org.eclipse.linuxtools.tmf.core.analysis">
+      <module
+            analysis_module="org.eclipse.tracecompass.training.example.processing.ProcessingLatencyModule"
+            automatic="true"
+            id="org.eclipse.tracecompass.training.processing.module"
+            name="Processing Latency Analysis">
+         <tracetype
+               class="org.eclipse.tracecompass.tmf.ctf.core.trace.CtfTmfTrace">
+         </tracetype>
+      </module>
+   </extension>
 </plugin>
