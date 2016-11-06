@@ -10,6 +10,8 @@
 package org.eclipse.tracecompass.training.example.processing.views;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.tracecompass.analysis.timing.core.segmentstore.statistics.AbstractSegmentStatisticsAnalysis;
@@ -18,6 +20,7 @@ import org.eclipse.tracecompass.analysis.timing.ui.views.segmentstore.statistics
 import org.eclipse.tracecompass.tmf.core.analysis.TmfAbstractAnalysisModule;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.ITmfTreeViewerEntry;
 import org.eclipse.tracecompass.tmf.ui.viewers.tree.TmfTreeViewerEntry;
+import org.eclipse.tracecompass.training.example.processing.ProcessingLatencyStatisticsModule;
 
 /**
  * A statistics viewer showing processing latencies.
@@ -30,8 +33,7 @@ public class ProcessingLatencyStatisticsViewer extends AbstractSegmentStoreStati
 
     @Override
     protected TmfAbstractAnalysisModule createStatisticsAnalysiModule() {
-        // TODO: Return the statistics module (instead of null)
-        return null;
+        return new ProcessingLatencyStatisticsModule();
     }
 
     @Override
@@ -56,10 +58,12 @@ public class ProcessingLatencyStatisticsViewer extends AbstractSegmentStoreStati
             TmfTreeViewerEntry totalEntry = new SegmentStoreStatisticsEntry("Total", entry);
             entryList.add(totalEntry);
 
-            // This builds the tree structure and the columns in the statistics viewer
-            // TODO: - Get the "per segment statistics" from the module
-            //       - For each entry in the statistics map
-            //           - Add a new SegmentStoreStatisticsEntry as a child of "Total"
+            Map<String, SegmentStoreStatistics> perProcessingStats = module.getPerSegmentTypeStats();
+            if (perProcessingStats != null) {
+                for (Entry<String, SegmentStoreStatistics> statsEntry : perProcessingStats.entrySet()) {
+                    totalEntry.addChild(new SegmentStoreStatisticsEntry(statsEntry.getKey(), statsEntry.getValue()));
+                }
+            }
         }
         return root;
     }
