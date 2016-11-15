@@ -56,7 +56,7 @@
 				<stateAttribute type="eventField" value="requester" />
 				<stateAttribute type="constant" value="Threads" />
 				<stateAttribute type="eventField" value="id" />
-				<stateValue type="null" />
+				<stateValue type="int" value="$INITIALIZING" />
 			</stateChange>
 		</eventHandler>	
         <eventHandler eventName="ust_master:PROCESS_START">
@@ -65,7 +65,7 @@
 				<stateAttribute type="eventField" value="requester" />
 				<stateAttribute type="constant" value="Threads" />
 				<stateAttribute type="eventField" value="id" />
-				<stateValue type="null" />
+				<stateValue type="int" value="$PROCESSING" />
 			</stateChange>
 		</eventHandler>
 		<eventHandler eventName="ust_master:PROCESS_END">
