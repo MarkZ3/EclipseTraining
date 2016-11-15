@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="xmlDefinition.xsd">
+  <!-- *************************************************************************** * Copyright (c) 2016 Ericsson * * All 
+    rights reserved. This program and the accompanying materials are * made available under the terms of the Eclipse Public License 
+    v1.0 which * accompanies this distribution, and is available at * http://www.eclipse.org/legal/epl-v10.html *************************************************************************** -->
+  <pattern version="0" id="org.eclipse.tracecompass.training.processing.timing.analysis.xml">
+    <head>
+      <traceType id="org.eclipse.linuxtools.lttng2.ust.tracetype" />
+      <label value="Processing Latency XML" />
+    </head>
+
+    <patternHandler>
+      <test id="cond_same_data">
+        <if>
+          <and>
+            <condition>
+              <stateAttribute type="constant" value="#CurrentScenario" />
+              <stateAttribute type="constant" value="requester" />
+              <stateValue type="eventField" value="requester" />
+            </condition>
+            <condition>
+              <stateAttribute type="constant" value="#CurrentScenario" />
+              <stateAttribute type="constant" value="id" />
+              <stateValue type="eventField" value="id" />
+            </condition>
+          </and>
+        </if>
+      </test>
+
+      <action id="action_set_data">
+        <stateChange>
+          <stateAttribute type="constant" value="#CurrentScenario" />
+          <stateAttribute type="constant" value="requester" />
+          <stateValue type="eventField" value="requester" />
+        </stateChange>
+        <stateChange>
+          <stateAttribute type="constant" value="#CurrentScenario" />
+          <stateAttribute type="constant" value="id" />
+          <stateValue type="eventField" value="id" />
+        </stateChange>
+      </action>
+
+      <action id="processing_endeded">
+        <segment>
+          <segType segName="PROCESSING" />
+          <segContent>
+            <segField name="requester" type="string">
+              <stateValue type="eventField" value="requester" />
+            </segField>
+            <segField name="id" type="string">
+              <stateValue type="eventField" value="id" />
+            </segField>
+          </segContent>
+        </segment>
+      </action>
+
+      <fsm id="processing times">
+        <precondition event="ust_master:PROCESS_START" />
+        <precondition event="ust_master:PROCESS_END" />
+        <state id="init">
+          <transition event="ust_master:PROCESS_START" target="begin" action="action_set_data" />
+        </state>
+        <state id="begin">
+          <transition event="ust_master:PROCESS_END" target="end" cond="cond_same_data" />
+        </state>
+        <final id="end" />
+      </fsm>
+    </patternHandler>
+  </pattern>
+</tmfxml>
