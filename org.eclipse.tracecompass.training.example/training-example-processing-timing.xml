@@ -61,7 +61,8 @@
           <transition event="ust_master:PROCESS_START" target="begin" action="action_set_data" />
         </state>
         <state id="begin">
-          <transition event="ust_master:PROCESS_END" target="end" cond="cond_same_data" />
+          <transition event="ust_master:PROCESS_END" target="end" cond="cond_same_data"
+            action="processing_endeded" />
         </state>
         <final id="end" />
       </fsm>
