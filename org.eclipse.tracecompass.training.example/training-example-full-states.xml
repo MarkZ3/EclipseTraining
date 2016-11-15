@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tmfxml xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../org.eclipse.linuxtools.tmf.analysis.xml.core/src/org/eclipse/linuxtools/tmf/analysis/xml/core/module/xmlDefinition.xsd">
+<!--
+ Copyright (c) 2016 Ericsson
+
+ All rights reserved. This program and the accompanying materials are
+ made available under the terms of the Eclipse Public License v1.0 which
+ accompanies this distribution, and is available at
+ http://www.eclipse.org/legal/epl-v10.html
+
+ Contributors:
+    Bernd Hufmann - Initial API and implementation
+-->
+
+    <stateProvider version="0" id="org.eclipse.tracecompass.training.processing.analysis.xml">
+        <head>
+            <traceType id="org.eclipse.linuxtools.lttng2.ust.tracetype" />
+            <label value="Processing Analysis XML" />
+        </head>
+
+        <definedValue name="INITIALIZING" value="0" />
+        <definedValue name="PROCESSING" value="1" />
+        <definedValue name="WAITING" value="2" />
+        
+		<eventHandler eventName="ust_master:CREATE">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateValue type="int" value="$INITIALIZING" />
+			</stateChange>
+		</eventHandler>	
+        <eventHandler eventName="ust_master:START">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateValue type="int" value="$PROCESSING" />
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="ust_master:STOP">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateValue type="int" value="$WAITING" />
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="ust_master:END">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateValue type="null" />
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="ust_master:PROCESS_INIT">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateAttribute type="constant" value="Threads" />
+				<stateAttribute type="eventField" value="id" />
+				<stateValue type="null" />
+			</stateChange>
+		</eventHandler>	
+        <eventHandler eventName="ust_master:PROCESS_START">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateAttribute type="constant" value="Threads" />
+				<stateAttribute type="eventField" value="id" />
+				<stateValue type="null" />
+			</stateChange>
+		</eventHandler>
+		<eventHandler eventName="ust_master:PROCESS_END">
+			<stateChange>
+				<stateAttribute type="constant" value="Requester" />
+				<stateAttribute type="eventField" value="requester" />
+				<stateAttribute type="constant" value="Threads" />
+				<stateAttribute type="eventField" value="id" />
+				<stateValue type="null" />
+			</stateChange>
+		</eventHandler>
+    </stateProvider>
+    
+    <timeGraphView id="org.eclipse.tracecompass.training.processing.analysis.xml.timegraph">
+		<head>
+			<analysis id="org.eclipse.tracecompass.training.processing.analysis.xml" />
+			<label value="Processing States XML" />
+		</head>
+
+		<!-- StateValues -->
+		<definedValue name="INITIALIZING" value="0" color="#888888" />
+		<definedValue name="PROCESSING" value="1" color="#bcdd68" />
+		<definedValue name="WAITING" value="2" color="#cccccc" />
+
+		<!-- Time Graph View -->
+		<entry path="Requester/*">
+			<display type="self" />
+			<entry path="Threads/*">
+				<display type="self" />
+			</entry>
+		</entry>
+		
+	</timeGraphView>
+</tmfxml>
